@@ -6,6 +6,7 @@ import org.semester.dto.EventDto;
 import org.semester.dto.UserDto;
 import org.semester.entity.Event;
 import org.semester.entity.EventImage;
+import org.semester.mappers.EventMapper;
 import org.semester.mappers.UserMapper;
 import org.semester.repository.EventImageRepository;
 import org.semester.repository.EventRepository;
@@ -35,6 +36,7 @@ public class EventServiceImpl implements EventService {
     private Environment environment;
     private static final String envPath = "spring.servlet.multipart.location";
     private UserMapper userMapper;
+    private EventMapper eventMapper;
 
     @Override
     public Event addEvent(Event event) {
@@ -43,15 +45,7 @@ public class EventServiceImpl implements EventService {
     @Override
     public List<EventDto> getEvents(Integer page) {
         return eventRepository.findAll(PageRequest.of(page, PAGE_SIZE)).map(
-                event -> EventDto.builder()
-                        .id(event.getId())
-                        .name(event.getName())
-                        .description(event.getDescription())
-                        .latitude(event.getLatitude())
-                        .longitude(event.getLongitude())
-                        .authorId(event.getAuthor().getId())
-                        .eventImages(event.getEventImages().stream().map(EventImage::getPath).toList())
-                        .build()
+                event -> eventMapper.getEventDto(event)
         ).toList();
     }
 
@@ -59,16 +53,7 @@ public class EventServiceImpl implements EventService {
     public List<EventDto> findByNameContaining(String name, Integer page) {
         return eventRepository.findByNameContaining(name, PageRequest.of(page, PAGE_SIZE))
                 .stream()
-                .map(event -> EventDto
-                        .builder()
-                        .id(event.getId())
-                        .date(event.getDate())
-                        .name(event.getName())
-                        .authorId(event.getAuthor().getId())
-                        .description(event.getDescription())
-                        .latitude(event.getLatitude())
-                        .longitude(event.getLongitude())
-                        .build())
+                .map(event -> eventMapper.getEventDto(event))
                 .collect(Collectors.toList());
     }
 
@@ -79,14 +64,7 @@ public class EventServiceImpl implements EventService {
             return null;
         }
         Event event = optionalEvent.get();
-        return EventDto.builder()
-                .id(event.getId())
-                .date(event.getDate())
-                .name(event.getName())
-                .description(event.getDescription())
-                .latitude(event.getLatitude())
-                .longitude(event.getLongitude())
-                .build();
+        return eventMapper.getEventDto(event);
     }
 
     @Override

@@ -30,24 +30,24 @@ public class TokenUtil {
         return Keys.hmacShaKeyFor(base64KeyBytes);
     }
 
-    public Map<String, String> generatePair(String email) {
+    public Map<String, String> generatePair(String email, String role) {
         Map<String, String> output = new HashMap<>();
-        output.put("access", generateToken(email, "access"));
-        output.put("refresh", generateToken(email, "refresh"));
+        output.put("access", generateToken(email, "access", role));
+        output.put("refresh", generateToken(email, "refresh", role));
         return output;
     }
 
-    public String generateToken(String email, String type) {
+    public String generateToken(String email, String type, String role) {
         Map<String, Object> claims = new HashMap<>();
         claims.put("email", email);
         claims.put("type", type);
+        claims.put("role", role);
         Date issuedAt = new Date();
         Date expires;
         if (type.equals("access")) {
             expires = new Date(issuedAt.getTime() + accessTokenLifetime.toMillis());
         }
         else {
-            claims.put("uuid", UUID.randomUUID());
             expires = new Date(issuedAt.getTime() + refreshTokenLifetime.toMillis());
         }
         return Jwts.builder()
@@ -68,5 +68,9 @@ public class TokenUtil {
 
     public String getEmail(String token) {
         return (String) getClaims(token).get("email");
+    }
+
+    public String getRole(String token) {
+        return (String) getClaims(token).get("role");
     }
 }

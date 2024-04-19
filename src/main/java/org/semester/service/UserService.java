@@ -1,6 +1,7 @@
 package org.semester.service;
 
 import org.semester.dto.EventDto;
+import org.semester.dto.RoleDto;
 import org.semester.dto.UserDto;
 import org.semester.entity.User;
 import org.springframework.web.multipart.MultipartFile;
@@ -24,4 +25,5 @@ public interface UserService {
     Boolean unsubscribeFromEvent(String email, Long eventId);
     List<EventDto> getSubscribedEvents(Long id);
     String getPassword(String email);
+    RoleDto getRole(String email);
 }

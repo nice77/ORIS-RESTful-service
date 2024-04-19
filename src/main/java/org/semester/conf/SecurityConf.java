@@ -35,6 +35,7 @@ public class SecurityConf {
                     customizer
                             .requestMatchers("/auth/**").permitAll()
                             .requestMatchers("/users/new").permitAll()
+                            .requestMatchers("/admin/**").hasRole("ADMIN")
                             .requestMatchers("/**").authenticated()
                 )
                 .sessionManagement(customizer -> customizer.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
