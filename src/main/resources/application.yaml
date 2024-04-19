@@ -1,0 +1,27 @@
+spring:
+  jpa:
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+    hibernate:
+      ddl-auto: update
+  datasource:
+    url: jdbc:postgresql://localhost:5432/android_semester
+    username: postgres
+    password: 2580456
+    driverClassName: org.postgresql.Driver
+  main:
+    allow-bean-definition-overriding: true
+  servlet:
+    multipart:
+      enabled: true
+      location: C:\profileImages\
+jwt:
+  secret: keklolkeklolkeklolkeklolkeklolkeklolkeklolkeklolkeklolkeklolkeklolkeklol
+  lifetime: 5m
+  refresh-lifetime: 1d
+server:
+  error:
+    include-message: always
+  servlet:
+    context-path: /api
