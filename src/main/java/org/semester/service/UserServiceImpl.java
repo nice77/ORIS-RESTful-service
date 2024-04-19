@@ -2,16 +2,19 @@ package org.semester.service;
 
 import lombok.AllArgsConstructor;
 import org.semester.dto.EventDto;
+import org.semester.dto.RoleDto;
 import org.semester.dto.UserDto;
 import org.semester.entity.Event;
 import org.semester.entity.EventImage;
 import org.semester.entity.User;
 import org.semester.mappers.EventMapper;
+import org.semester.mappers.RoleMapper;
 import org.semester.mappers.UserMapper;
 import org.semester.repository.EventRepository;
 import org.semester.repository.UserRepository;
 import org.springframework.core.env.Environment;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -40,6 +43,7 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     private EventRepository eventRepository;
     private UserMapper userMapper;
     private EventMapper eventMapper;
+    private RoleMapper roleMapper;
     private static final int PAGE_SIZE = 10;
     private Environment environment;
     private static final String envPath = "spring.servlet.multipart.location";
@@ -206,6 +210,12 @@ public class UserServiceImpl implements UserService, UserDetailsService {
         }
         return org.springframework.security.core.userdetails.User.builder()
                 .username(userDto.getName())
+                .authorities(new SimpleGrantedAuthority(userDto.getRole().getRole()))
                 .build();
+    }
+
+    @Override
+    public RoleDto getRole(String email) {
+        return roleMapper.getRoleDto(userRepository.findByEmail(email).getRole());
     }
 }

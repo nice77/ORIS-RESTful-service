@@ -14,6 +14,8 @@ import org.semester.util.StaticString;
 import org.semester.util.TokenUtil;
 import org.springframework.http.MediaType;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
@@ -34,10 +36,12 @@ public class TokenFilter extends OncePerRequestFilter {
         String authHeader = request.getHeader("Authorization");
         String jwt;
         String email = null;
+        String role = null;
         if (authHeader != null && authHeader.startsWith("Bearer ")) {
             jwt = authHeader.substring(7);
             try {
                 email = tokenUtil.getEmail(jwt);
+                role = tokenUtil.getRole(jwt);
             } catch (SignatureException | MalformedJwtException  e) {
                 sendError(response, HttpServletResponse.SC_FORBIDDEN, StaticString.BAD_TOKEN.getValue());
                 return;
@@ -46,11 +50,12 @@ public class TokenFilter extends OncePerRequestFilter {
                 return;
             }
         }
+        System.out.println("Setting role: " + role);
         if (email != null && SecurityContextHolder.getContext().getAuthentication() == null) {
             UsernamePasswordAuthenticationToken token = new UsernamePasswordAuthenticationToken(
                     email,
                     null,
-                    List.of(new SimpleGrantedAuthority("USER"))
+                    List.of(new SimpleGrantedAuthority(role))
             );
             SecurityContextHolder.getContext().setAuthentication(token);
         }

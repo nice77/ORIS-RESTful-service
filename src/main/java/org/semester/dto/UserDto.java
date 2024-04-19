@@ -16,4 +16,5 @@ public class UserDto {
     private String email;
     private String city;
     private String userImage;
+    private RoleDto role;
 }

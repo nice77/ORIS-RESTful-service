@@ -1,11 +1,15 @@
 package org.semester.mappers;
 
+import lombok.AllArgsConstructor;
 import org.semester.dto.UserDto;
 import org.semester.entity.User;
 import org.springframework.stereotype.Component;
 
 @Component
+@AllArgsConstructor
 public class UserMapper {
+
+    private RoleMapper roleMapper;
 
     public UserDto getUserDto(User user) {
         return UserDto.builder()
@@ -15,6 +19,7 @@ public class UserMapper {
                 .email(user.getEmail())
                 .age(user.getAge())
                 .userImage(user.getUserImage())
+                .role(roleMapper.getRoleDto(user.getRole()))
                 .build();
     }
 
@@ -26,6 +31,7 @@ public class UserMapper {
                 .email(userDto.getEmail())
                 .age(userDto.getAge())
                 .userImage(userDto.getUserImage())
+                .role(roleMapper.getRoleEntity(userDto.getRole()))
                 .build();
     }
 }

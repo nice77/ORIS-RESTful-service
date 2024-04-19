@@ -5,6 +5,7 @@ import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.MalformedJwtException;
 import io.jsonwebtoken.security.SignatureException;
 import lombok.AllArgsConstructor;
+import org.semester.dto.RoleDto;
 import org.semester.dto.authServiceDto.AuthorizeRequest;
 import org.semester.dto.UserDto;
 import org.semester.dto.authServiceDto.RefreshRequest;
@@ -49,7 +50,9 @@ public class AuthenticationController {
             ErrorDto error = new ErrorDto(StaticString.WRONG_CREDENTIALS.getValue());
             return new ResponseEntity<>(error, HttpStatus.UNAUTHORIZED);
         }
-        Map<String, String> tokens = tokenUtil.generatePair(request.getEmail());
+        String email = request.getEmail();
+        String role = userDto.getRole().getRole();
+        Map<String, String> tokens = tokenUtil.generatePair(email, role);
         tokenService.addToken(Token.builder()
                 .token(tokens.get("refresh"))
                 .isRevoked(false)
@@ -72,8 +75,11 @@ public class AuthenticationController {
             return new ResponseEntity<>(error, HttpStatus.UNAUTHORIZED);
         }
         String email;
+        String role;
+        String jwt = request.getRefresh();
         try {
-            email = tokenUtil.getEmail(request.getRefresh());
+            email = tokenUtil.getEmail(jwt);
+            role = tokenUtil.getRole(jwt);
         } catch (ExpiredJwtException e) {
             ErrorDto error = new ErrorDto(StaticString.EXPIRED_TOKEN.getValue());
             return new ResponseEntity<>(error, HttpStatus.UNAUTHORIZED);
@@ -83,7 +89,7 @@ public class AuthenticationController {
         }
         found.setIsRevoked(true);
         tokenService.updateToken(found);
-        Map<String, String> tokens = tokenUtil.generatePair(email);
+        Map<String, String> tokens = tokenUtil.generatePair(email, role);
         tokenService.addToken(Token.builder()
                         .token(tokens.get("refresh"))
                         .isRevoked(false)

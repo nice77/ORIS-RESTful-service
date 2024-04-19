@@ -49,4 +49,8 @@ public class User {
     private List<User> subscribers;
 
     private String userImage;
+
+    @ManyToOne
+    @JoinColumn(name = "role_id")
+    private Role role;
 }
