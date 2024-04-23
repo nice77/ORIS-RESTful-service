@@ -60,6 +60,11 @@ public class EventController {
         return eventService.getImage(id, number);
     }
 
+    @GetMapping(value="/event-image/{fileName}", produces = MediaType.IMAGE_PNG_VALUE)
+    public byte[] getImage(@PathVariable String fileName) {
+        return eventService.getImage(fileName);
+    }
+
     @GetMapping("/{id}/subscribers")
     public List<UserDto> getSubscribers(@PathVariable Long id, @RequestParam Integer page) {
         return eventService.getSubscribers(id, page);

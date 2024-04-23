@@ -17,4 +17,6 @@ public interface EventService {
     void addImage(Long id, MultipartFile file);
     void deleteImage(Long id);
     byte[] getImage(Long id, Integer number);
+
+    byte[] getImage(String name);
 }
