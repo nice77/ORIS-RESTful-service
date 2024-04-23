@@ -218,4 +218,16 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     public RoleDto getRole(String email) {
         return roleMapper.getRoleDto(userRepository.findByEmail(email).getRole());
     }
+
+    @Override
+    public Boolean changeIsBanned(Long id) {
+        Optional<User> found = userRepository.findById(id);
+        if (found.isPresent()) {
+            User u = found.get();
+            u.setIsBanned(!u.getIsBanned());
+            userRepository.saveAndFlush(u);
+            return true;
+        }
+        return false;
+    }
 }

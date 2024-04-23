@@ -26,4 +26,5 @@ public interface UserService {
     List<EventDto> getSubscribedEvents(Long id);
     String getPassword(String email);
     RoleDto getRole(String email);
+    Boolean changeIsBanned(Long id);
 }
