@@ -20,6 +20,7 @@ public class UserMapper {
                 .age(user.getAge())
                 .userImage(user.getUserImage())
                 .role(roleMapper.getRoleDto(user.getRole()))
+                .isBanned(user.getIsBanned())
                 .build();
     }
 
@@ -32,6 +33,7 @@ public class UserMapper {
                 .age(userDto.getAge())
                 .userImage(userDto.getUserImage())
                 .role(roleMapper.getRoleEntity(userDto.getRole()))
+                .isBanned(userDto.getIsBanned())
                 .build();
     }
 }

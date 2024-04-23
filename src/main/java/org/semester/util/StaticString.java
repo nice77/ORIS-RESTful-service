@@ -8,7 +8,8 @@ public enum StaticString {
     EXPIRED_TOKEN("Expired token"),
     USED_TOKEN("Used token"),
     WRONG_CREDENTIALS("Wrong credentials"),
-    EMAIL_IN_USE("Email is in use");
+    EMAIL_IN_USE("Email is in use"),
+    BANNED("Banned");
 
     private final String value;
     StaticString(String value) {

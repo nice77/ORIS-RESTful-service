@@ -20,7 +20,6 @@ public class AdminController {
 
     @GetMapping("/user")
     public ResponseEntity<List<UserDto>> getUsers(@RequestParam("page") Integer page) {
-        System.out.println("In controller");
         return ResponseEntity.ok(userService.getUsers(page));
     }
 
@@ -32,6 +31,11 @@ public class AdminController {
     @DeleteMapping("/user/{id}")
     public void deleteUser(@PathVariable Long id) {
         userService.deleteUser(id);
+    }
+
+    @PostMapping("/ban/{id}")
+    public Boolean changeIsBanned(@PathVariable Long id) {
+        return userService.changeIsBanned(id);
     }
 
     @GetMapping("/event")

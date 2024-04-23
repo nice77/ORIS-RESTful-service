@@ -10,6 +10,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.AllArgsConstructor;
 import org.semester.dto.ErrorDto;
+import org.semester.service.UserService;
 import org.semester.util.StaticString;
 import org.semester.util.TokenUtil;
 import org.springframework.http.MediaType;
@@ -50,7 +51,6 @@ public class TokenFilter extends OncePerRequestFilter {
                 return;
             }
         }
-        System.out.println("Setting role: " + role);
         if (email != null && SecurityContextHolder.getContext().getAuthentication() == null) {
             UsernamePasswordAuthenticationToken token = new UsernamePasswordAuthenticationToken(
                     email,

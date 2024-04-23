@@ -17,4 +17,5 @@ public class UserDto {
     private String city;
     private String userImage;
     private RoleDto role;
+    private Boolean isBanned;
 }

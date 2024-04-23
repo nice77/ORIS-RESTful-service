@@ -50,6 +50,10 @@ public class AuthenticationController {
             ErrorDto error = new ErrorDto(StaticString.WRONG_CREDENTIALS.getValue());
             return new ResponseEntity<>(error, HttpStatus.UNAUTHORIZED);
         }
+        if (userDto.getIsBanned()) {
+            ErrorDto error = new ErrorDto(StaticString.BANNED.getValue());
+            return new ResponseEntity<>(error, HttpStatus.UNAUTHORIZED);
+        }
         String email = request.getEmail();
         String role = userDto.getRole().getRole();
         Map<String, String> tokens = tokenUtil.generatePair(email, role);
