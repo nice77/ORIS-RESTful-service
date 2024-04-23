@@ -122,6 +122,15 @@ public class EventServiceImpl implements EventService {
         }
     }
 
+    @Override
+    public byte[] getImage(String name) {
+        try {
+            return Files.readAllBytes(Path.of(environment.getProperty(envPath) + "/events/" + name));
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
     private void deleteImageFromDisk(List<EventImage> images) {
         images.forEach(eventImage -> {
             try {
