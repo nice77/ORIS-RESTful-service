@@ -1,6 +1,7 @@
 package org.semester.mappers;
 
-import org.semester.dto.EventDto;
+import org.semester.dto.eventDto.EventDto;
+import org.semester.dto.eventDto.OnCreateEventDto;
 import org.semester.entity.Event;
 import org.semester.entity.EventImage;
 import org.semester.entity.User;
@@ -21,6 +22,17 @@ public class EventMapper {
                 .eventImages(event.getEventImages().stream().map( path ->
                         "events/event-image/" + path.getPath()
                 ).toList())
+                .build();
+    }
+
+    public Event getEventEntity(OnCreateEventDto onCreateEventDto, User author) {
+        return Event.builder()
+                .name(onCreateEventDto.getName())
+                .description(onCreateEventDto.getDescription())
+                .author(author)
+                .date(onCreateEventDto.getDate())
+                .latitude(onCreateEventDto.getLatitude())
+                .longitude(onCreateEventDto.getLongitude())
                 .build();
     }
 

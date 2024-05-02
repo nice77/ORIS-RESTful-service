@@ -1,7 +1,10 @@
 package org.semester.service;
 
 import org.semester.dto.*;
-import org.semester.entity.User;
+import org.semester.dto.eventDto.EventDto;
+import org.semester.dto.userDto.FullUserDto;
+import org.semester.dto.userDto.RegisterUserDto;
+import org.semester.dto.userDto.UserDto;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;

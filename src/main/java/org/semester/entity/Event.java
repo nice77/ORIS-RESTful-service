@@ -27,8 +27,8 @@ public class Event {
     private String name;
     private String description;
     private Date date;
-    private Long latitude;
-    private Long longitude;
+    private Double latitude;
+    private Double longitude;
 
     @ManyToOne
     @JoinColumn(name = "author_id")

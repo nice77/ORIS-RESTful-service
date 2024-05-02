@@ -1,8 +1,8 @@
 package org.semester.mappers;
 
 import lombok.AllArgsConstructor;
-import org.semester.dto.FullUserDto;
-import org.semester.dto.UserDto;
+import org.semester.dto.userDto.FullUserDto;
+import org.semester.dto.userDto.UserDto;
 import org.semester.entity.User;
 import org.springframework.stereotype.Component;
 

@@ -1,21 +1,23 @@
 package org.semester.service;
 
-import org.semester.dto.EventDto;
-import org.semester.dto.UserDto;
+import org.semester.dto.eventDto.EventDto;
+import org.semester.dto.eventDto.OnCreateEventDto;
+import org.semester.dto.userDto.UserDto;
 import org.semester.entity.Event;
+import org.semester.entity.User;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
 public interface EventService {
-    Event addEvent(Event event);
+    EventDto addEvent(OnCreateEventDto onCreateEventDto, String email);
     List<EventDto> getEvents(Integer page);
     List<EventDto> findByNameContaining(String name, Integer page);
     EventDto findById(Long id);
     List<UserDto> getSubscribers(Long id, Integer page);
-    void deleteEvent(Long id);
+    Boolean deleteEvent(Long id);
     Boolean addImage(Long id, MultipartFile file, String email);
-    void deleteImage(Long id);
+    Boolean deleteImage(Long id);
     byte[] getImage(Long id, Integer number);
     byte[] getImage(String name);
 }

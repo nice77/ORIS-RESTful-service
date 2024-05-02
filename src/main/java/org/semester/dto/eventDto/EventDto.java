@@ -1,9 +1,7 @@
-package org.semester.dto;
+package org.semester.dto.eventDto;
 
 
 import lombok.*;
-import org.semester.entity.EventImage;
-import org.semester.entity.User;
 
 import java.util.Date;
 import java.util.List;
@@ -19,8 +17,8 @@ public class EventDto {
     private Date date;
     private String name;
     private String description;
-    private Long latitude;
-    private Long longitude;
+    private Double latitude;
+    private Double longitude;
     private Long authorId;
     private List<String> eventImages;
 }

@@ -2,6 +2,10 @@ package org.semester.service;
 
 import lombok.AllArgsConstructor;
 import org.semester.dto.*;
+import org.semester.dto.eventDto.EventDto;
+import org.semester.dto.userDto.FullUserDto;
+import org.semester.dto.userDto.RegisterUserDto;
+import org.semester.dto.userDto.UserDto;
 import org.semester.entity.*;
 import org.semester.mappers.EventMapper;
 import org.semester.mappers.RoleMapper;

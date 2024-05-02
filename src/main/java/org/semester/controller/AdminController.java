@@ -1,11 +1,10 @@
 package org.semester.controller;
 
 import lombok.AllArgsConstructor;
-import org.semester.dto.EventDto;
-import org.semester.dto.UserDto;
+import org.semester.dto.eventDto.EventDto;
+import org.semester.dto.userDto.UserDto;
 import org.semester.service.EventService;
 import org.semester.service.UserService;
-import org.springframework.data.jpa.repository.Query;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 

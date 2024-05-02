@@ -1,11 +1,15 @@
 package org.semester.controller;
 
 import lombok.AllArgsConstructor;
-import org.semester.dto.EventDto;
-import org.semester.dto.UserDto;
+import org.semester.dto.eventDto.EventDto;
+import org.semester.dto.eventDto.OnCreateEventDto;
+import org.semester.dto.userDto.UserDto;
 import org.semester.entity.Event;
 import org.semester.service.EventService;
+import org.semester.service.UserService;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -19,6 +23,7 @@ import java.util.List;
 public class EventController {
 
     private EventService eventService;
+    private UserService userService;
 
     @GetMapping("/{id}")
     public EventDto getEvent(@PathVariable Long id) {
@@ -36,14 +41,16 @@ public class EventController {
     }
 
     @PostMapping
-    public void addEvent(@RequestBody Event event) {
-        System.out.println("Event: " + event);
-        eventService.addEvent(event);
+    public EventDto addEvent(@RequestBody OnCreateEventDto onCreateEventDto, Principal principal) {
+        return eventService.addEvent(onCreateEventDto, principal.getName());
     }
 
     @DeleteMapping("/{id}")
-    public void deleteEvent(@PathVariable Long id) {
-        eventService.deleteEvent(id);
+    public ResponseEntity<?> deleteEvent(@PathVariable Long id) {
+        if (eventService.deleteEvent(id)) {
+            return ResponseEntity.ok().build();
+        }
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
     }
 
     @PostMapping("/{id}/event-image")
@@ -52,8 +59,11 @@ public class EventController {
     }
 
     @DeleteMapping("/{id}/event-image")
-    public void deleteImage(@PathVariable Long id) {
-        eventService.deleteImage(id);
+    public ResponseEntity<?> deleteImage(@PathVariable Long id) {
+        if (eventService.deleteImage(id)) {
+            return ResponseEntity.ok().build();
+        }
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
     }
 
     @GetMapping(value = "/{id}/event-image", produces = MediaType.IMAGE_PNG_VALUE)

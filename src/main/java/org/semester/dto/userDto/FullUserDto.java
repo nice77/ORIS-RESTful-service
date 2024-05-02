@@ -1,7 +1,8 @@
-package org.semester.dto;
+package org.semester.dto.userDto;
 
 
 import lombok.*;
+import org.semester.dto.RoleDto;
 
 @Builder
 @Data
