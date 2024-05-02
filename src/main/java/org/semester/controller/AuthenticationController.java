@@ -5,6 +5,7 @@ import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.MalformedJwtException;
 import io.jsonwebtoken.security.SignatureException;
 import lombok.AllArgsConstructor;
+import org.semester.dto.FullUserDto;
 import org.semester.dto.RoleDto;
 import org.semester.dto.authServiceDto.AuthorizeRequest;
 import org.semester.dto.UserDto;
@@ -40,22 +41,23 @@ public class AuthenticationController {
             produces = MediaType.APPLICATION_JSON_VALUE
     )
     public ResponseEntity<Object> authenticate(@RequestBody AuthorizeRequest request) {
-        UserDto userDto = userService.findByEmail(request.getEmail());
-        if (userDto == null) {
+        FullUserDto fullUserDto = userService.getFullUserByEmail(request.getEmail());
+        System.out.println("FullUserDto: " + fullUserDto);
+        if (fullUserDto == null) {
             ErrorDto error = new ErrorDto(StaticString.WRONG_CREDENTIALS.getValue());
             return new ResponseEntity<>(error, HttpStatus.UNAUTHORIZED);
         }
-        boolean isPasswordCorrect = passwordEncoder.matches(request.getPassword(), userService.getPassword(userDto.getEmail()));
+        boolean isPasswordCorrect = passwordEncoder.matches(request.getPassword(), userService.getPassword(fullUserDto.getEmail()));
         if (!isPasswordCorrect) {
             ErrorDto error = new ErrorDto(StaticString.WRONG_CREDENTIALS.getValue());
             return new ResponseEntity<>(error, HttpStatus.UNAUTHORIZED);
         }
-        if (userDto.getIsBanned()) {
+        if (fullUserDto.getIsBanned()) {
             ErrorDto error = new ErrorDto(StaticString.BANNED.getValue());
             return new ResponseEntity<>(error, HttpStatus.UNAUTHORIZED);
         }
         String email = request.getEmail();
-        String role = userDto.getRole().getRole();
+        String role = fullUserDto.getRole().getRole();
         Map<String, String> tokens = tokenUtil.generatePair(email, role);
         tokenService.addToken(Token.builder()
                 .token(tokens.get("refresh"))

@@ -16,7 +16,6 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.security.Principal;
 import java.util.List;
-import java.util.stream.Collectors;
 
 
 @RestController
@@ -102,11 +101,22 @@ public class UserController {
         }
     }
 
+    @GetMapping(value = "/user-image/{fileName}", produces = {MediaType.IMAGE_PNG_VALUE, MediaType.IMAGE_JPEG_VALUE})
+    public ResponseEntity<?> getUserImage(@PathVariable("fileName") String fileName) {
+        try {
+            return ResponseEntity.ok(userService.getProfileImageByFileName(fileName));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
+
     @PostMapping("/user-image")
     public ResponseEntity<?> addProfileImage(MultipartFile file, Principal principal) {
         if (userService.addProfileImage(file, principal.getName())) {
+            System.out.println("Returnin image");
             return ResponseEntity.ok().build();
         }
+        System.out.println("Not returnin image");
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
     }
 
@@ -126,7 +136,8 @@ public class UserController {
             produces = MediaType.APPLICATION_JSON_VALUE
     )
     public ResponseEntity<?> addUser(@RequestBody User user) {
-        if (userService.findByEmail(user.getEmail()) != null) {
+        UserDto userDto = userService.findByEmail(user.getEmail());
+        if (userDto != null) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ErrorDto(StaticString.EMAIL_IN_USE.getValue()));
         }
         return ResponseEntity.ok(userService.addUser(user));

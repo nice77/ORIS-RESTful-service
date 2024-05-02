@@ -3,17 +3,18 @@ package org.semester.dto;
 
 import lombok.*;
 
-@NoArgsConstructor
-@AllArgsConstructor
-@Getter
-@Setter
 @Builder
+@Data
+@AllArgsConstructor
+@NoArgsConstructor
 @ToString
-public class UserDto {
+public class FullUserDto {
     private Long id;
     private String name;
     private Integer age;
     private String email;
     private String city;
     private String userImage;
+    private RoleDto role;
+    private Boolean isBanned;
 }

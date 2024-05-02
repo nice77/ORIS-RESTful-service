@@ -18,7 +18,9 @@ public class EventMapper {
                 .date(event.getDate())
                 .latitude(event.getLatitude())
                 .longitude(event.getLongitude())
-                .eventImages(event.getEventImages().stream().map(EventImage::getPath).toList())
+                .eventImages(event.getEventImages().stream().map( path ->
+                        "events/event-image/" + path.getPath()
+                ).toList())
                 .build();
     }
 
