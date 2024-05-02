@@ -6,10 +6,12 @@ import org.semester.dto.EventDto;
 import org.semester.dto.UserDto;
 import org.semester.entity.Event;
 import org.semester.entity.EventImage;
+import org.semester.entity.User;
 import org.semester.mappers.EventMapper;
 import org.semester.mappers.UserMapper;
 import org.semester.repository.EventImageRepository;
 import org.semester.repository.EventRepository;
+import org.semester.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
 import org.springframework.data.domain.PageRequest;
@@ -32,6 +34,7 @@ public class EventServiceImpl implements EventService {
 
     private EventRepository eventRepository;
     private EventImageRepository eventImageRepository;
+    private UserRepository userRepository;
     private static final int PAGE_SIZE = 10;
     private Environment environment;
     private static final String envPath = "spring.servlet.multipart.location";
@@ -84,8 +87,12 @@ public class EventServiceImpl implements EventService {
     }
 
     @Override
-    public void addImage(Long id, MultipartFile file) {
+    public Boolean addImage(Long id, MultipartFile file, String email) {
         Event event = eventRepository.findById(id).orElseThrow();
+        User user = userRepository.findByEmail(email);
+        if (event.getAuthor().getId() != user.getId()) {
+            return false;
+        }
         String type = (file.getContentType().equals("image/png")) ? "png" : "jpg";
         String name = UUID.randomUUID() + "." + type;
         event.getEventImages().add(
@@ -100,6 +107,7 @@ public class EventServiceImpl implements EventService {
             throw new RuntimeException(e);
         }
         eventRepository.saveAndFlush(event);
+        return true;
     }
 
     @Override

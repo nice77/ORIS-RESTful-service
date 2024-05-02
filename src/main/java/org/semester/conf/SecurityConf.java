@@ -33,8 +33,11 @@ public class SecurityConf {
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(customizer ->
                     customizer
+//                            .requestMatchers("/**").authenticated()
                             .requestMatchers("/auth/**").permitAll()
                             .requestMatchers("/users/new").permitAll()
+                            .requestMatchers("/users/user-image/**").permitAll()
+                            .requestMatchers("/events/event-image/**").permitAll()
                             .requestMatchers("/admin/**").hasRole("ADMIN")
                             .requestMatchers("/**").authenticated()
                 )

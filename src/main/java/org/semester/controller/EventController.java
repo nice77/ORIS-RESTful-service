@@ -9,6 +9,7 @@ import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.security.Principal;
 import java.util.List;
 
 
@@ -46,8 +47,8 @@ public class EventController {
     }
 
     @PostMapping("/{id}/event-image")
-    public void addImage(@PathVariable Long id, MultipartFile file) {
-        eventService.addImage(id, file);
+    public Boolean addImage(@PathVariable Long id, MultipartFile file, Principal principal) {
+        return eventService.addImage(id, file, principal.getName());
     }
 
     @DeleteMapping("/{id}/event-image")

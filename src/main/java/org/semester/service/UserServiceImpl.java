@@ -2,16 +2,16 @@ package org.semester.service;
 
 import lombok.AllArgsConstructor;
 import org.semester.dto.EventDto;
+import org.semester.dto.FullUserDto;
 import org.semester.dto.RoleDto;
 import org.semester.dto.UserDto;
-import org.semester.entity.Event;
-import org.semester.entity.EventImage;
-import org.semester.entity.User;
+import org.semester.entity.*;
 import org.semester.mappers.EventMapper;
 import org.semester.mappers.RoleMapper;
 import org.semester.mappers.UserMapper;
 import org.semester.repository.EventRepository;
 import org.semester.repository.UserRepository;
+import org.semester.util.TokenUtil;
 import org.springframework.core.env.Environment;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -19,7 +19,6 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -28,10 +27,7 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 import java.util.stream.Collectors;
 
 
@@ -44,14 +40,31 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     private UserMapper userMapper;
     private EventMapper eventMapper;
     private RoleMapper roleMapper;
+    private TokenUtil tokenUtil;
+    private TokenService tokenService;
     private static final int PAGE_SIZE = 10;
     private Environment environment;
     private static final String envPath = "spring.servlet.multipart.location";
 
     @Override
-    public User addUser(User user) {
+    public Map<String, String> addUser(User user) {
         user.setPassword((new BCryptPasswordEncoder()).encode(user.getPassword()));
-        return userRepository.saveAndFlush(user);
+        user.setUserImage("default.jpg");
+        Role role = Role.builder()
+                .id(1L)
+                .role("ROLE_USER")
+                .build();
+        user.setRole(role);
+        user.setAge(20);
+        user.setCity("");
+        user.setIsBanned(false);
+        userRepository.saveAndFlush(user);
+        Map<String, String> tokens = tokenUtil.generatePair(user.getEmail(), "ROLE_USER");
+        tokenService.addToken(Token.builder()
+                .token(tokens.get("refresh"))
+                .isRevoked(false)
+                .build());
+        return tokens;
     }
 
     @Override
@@ -128,6 +141,15 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     }
 
     @Override
+    public byte[] getProfileImageByFileName(String fileName) {
+        try {
+            return Files.readAllBytes(Path.of(environment.getProperty(envPath) + fileName));
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    @Override
     public Boolean addProfileImage(MultipartFile file, String userEmail) {
         if (!file.getContentType().equals("image/png")
                 && !file.getContentType().equals("image/jpg")
@@ -138,8 +160,9 @@ public class UserServiceImpl implements UserService, UserDetailsService {
         try {
             String type = (file.getContentType().equals("image/png")) ? "png" : "jpg";
             String name = UUID.randomUUID() + "." + type;
-            UserDto userDto = findByEmail(userEmail);
-            userRepository.saveAndFlush(userMapper.getUserEntity(userDto));
+            User user = userRepository.findByEmail(userEmail);
+            user.setUserImage(name);
+            userRepository.saveAndFlush(user);
             file.transferTo(new File(environment.getProperty(envPath) + name));
             return true;
         } catch (IOException e) {
@@ -149,16 +172,17 @@ public class UserServiceImpl implements UserService, UserDetailsService {
 
     @Override
     public Boolean deleteProfileImage(String userEmail) {
-        UserDto userDto = findByEmail(userEmail);
-        if (userDto == null) {
+        User user = userRepository.findByEmail(userEmail);
+        if (user == null) {
             return false;
         }
         try {
-            Files.delete(Path.of(environment.getProperty(envPath) + userDto.getUserImage()));
+            Files.delete(Path.of(environment.getProperty(envPath) + user.getUserImage()));
         } catch (IOException e) {
             return false;
         }
-        userRepository.saveAndFlush(userMapper.getUserEntity(userDto));
+        user.setUserImage(null);
+        userRepository.saveAndFlush(user);
         return true;
     }
 
@@ -204,19 +228,28 @@ public class UserServiceImpl implements UserService, UserDetailsService {
 
     @Override
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
-        UserDto userDto = findByEmail(email);
-        if (userDto == null) {
+        User user = userRepository.findByEmail(email);
+        if (user == null) {
             throw new UsernameNotFoundException(String.format("Email '%s' was not found", email));
         }
         return org.springframework.security.core.userdetails.User.builder()
-                .username(userDto.getName())
-                .authorities(new SimpleGrantedAuthority(userDto.getRole().getRole()))
+                .username(user.getName())
+                .authorities(new SimpleGrantedAuthority(user.getRole().getRole()))
                 .build();
     }
 
     @Override
     public RoleDto getRole(String email) {
         return roleMapper.getRoleDto(userRepository.findByEmail(email).getRole());
+    }
+
+    @Override
+    public FullUserDto getFullUserByEmail(String email) {
+        User found = userRepository.findByEmail(email);
+        if (found == null) {
+            return null;
+        }
+        return userMapper.getFullUserDto(found);
     }
 
     @Override

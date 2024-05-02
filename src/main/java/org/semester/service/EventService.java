@@ -14,9 +14,8 @@ public interface EventService {
     EventDto findById(Long id);
     List<UserDto> getSubscribers(Long id, Integer page);
     void deleteEvent(Long id);
-    void addImage(Long id, MultipartFile file);
+    Boolean addImage(Long id, MultipartFile file, String email);
     void deleteImage(Long id);
     byte[] getImage(Long id, Integer number);
-
     byte[] getImage(String name);
 }
