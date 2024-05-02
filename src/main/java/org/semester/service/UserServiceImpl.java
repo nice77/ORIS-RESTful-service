@@ -1,10 +1,7 @@
 package org.semester.service;
 
 import lombok.AllArgsConstructor;
-import org.semester.dto.EventDto;
-import org.semester.dto.FullUserDto;
-import org.semester.dto.RoleDto;
-import org.semester.dto.UserDto;
+import org.semester.dto.*;
 import org.semester.entity.*;
 import org.semester.mappers.EventMapper;
 import org.semester.mappers.RoleMapper;
@@ -47,19 +44,21 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     private static final String envPath = "spring.servlet.multipart.location";
 
     @Override
-    public Map<String, String> addUser(User user) {
-        user.setPassword((new BCryptPasswordEncoder()).encode(user.getPassword()));
-        user.setUserImage("default.jpg");
+    public Map<String, String> addUser(RegisterUserDto registerUserDto) {
+        User newUser = User.builder().build();
+        newUser.setEmail(registerUserDto.getEmail());
+        newUser.setPassword((new BCryptPasswordEncoder()).encode(registerUserDto.getPassword()));
+        newUser.setUserImage("default.jpg");
         Role role = Role.builder()
                 .id(1L)
                 .role("ROLE_USER")
                 .build();
-        user.setRole(role);
-        user.setAge(20);
-        user.setCity("");
-        user.setIsBanned(false);
-        userRepository.saveAndFlush(user);
-        Map<String, String> tokens = tokenUtil.generatePair(user.getEmail(), "ROLE_USER");
+        newUser.setRole(role);
+        newUser.setAge(20);
+        newUser.setCity("");
+        newUser.setIsBanned(false);
+        userRepository.saveAndFlush(newUser);
+        Map<String, String> tokens = tokenUtil.generatePair(newUser.getEmail(), role.getRole());
         tokenService.addToken(Token.builder()
                 .token(tokens.get("refresh"))
                 .isRevoked(false)
