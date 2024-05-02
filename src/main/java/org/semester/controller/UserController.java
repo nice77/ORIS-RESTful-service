@@ -4,6 +4,7 @@ package org.semester.controller;
 import lombok.AllArgsConstructor;
 import org.semester.dto.ErrorDto;
 import org.semester.dto.EventDto;
+import org.semester.dto.RegisterUserDto;
 import org.semester.dto.UserDto;
 import org.semester.entity.User;
 import org.semester.service.UserService;
@@ -135,12 +136,12 @@ public class UserController {
             consumes = MediaType.APPLICATION_JSON_VALUE,
             produces = MediaType.APPLICATION_JSON_VALUE
     )
-    public ResponseEntity<?> addUser(@RequestBody User user) {
-        UserDto userDto = userService.findByEmail(user.getEmail());
+    public ResponseEntity<?> addUser(@RequestBody RegisterUserDto registerUserDto) {
+        UserDto userDto = userService.findByEmail(registerUserDto.getEmail());
         if (userDto != null) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ErrorDto(StaticString.EMAIL_IN_USE.getValue()));
         }
-        return ResponseEntity.ok(userService.addUser(user));
+        return ResponseEntity.ok(userService.addUser(registerUserDto));
     }
 
     @PatchMapping(

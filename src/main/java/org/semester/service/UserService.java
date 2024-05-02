@@ -1,9 +1,6 @@
 package org.semester.service;
 
-import org.semester.dto.EventDto;
-import org.semester.dto.FullUserDto;
-import org.semester.dto.RoleDto;
-import org.semester.dto.UserDto;
+import org.semester.dto.*;
 import org.semester.entity.User;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -11,7 +8,7 @@ import java.util.List;
 import java.util.Map;
 
 public interface UserService {
-    Map<String, String> addUser(User user);
+    Map<String, String> addUser(RegisterUserDto registerUserDto);
     List<UserDto> getUsers(Integer page);
     List<UserDto> findByNameContaining(String name, Integer page);
     UserDto findByEmail(String email);
