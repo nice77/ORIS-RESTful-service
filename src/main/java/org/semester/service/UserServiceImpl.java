@@ -111,11 +111,19 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     }
 
     @Override
-    public void updateUser(User user) {
-        if (!userRepository.existsById(user.getId())) {
-            return;
+    public Boolean updateUser(UserDto userDto) {
+        Optional<User> optionalUser = userRepository.findById(userDto.getId());
+        if (optionalUser.isEmpty()) {
+            return false;
         }
-        userRepository.saveAndFlush(user);
+        User newUser = userMapper.getUserEntity(userDto);
+        User foundUser = optionalUser.get();
+        newUser.setPassword(foundUser.getPassword());
+        newUser.setRole(foundUser.getRole());
+        newUser.setIsBanned(foundUser.getIsBanned());
+
+        userRepository.saveAndFlush(newUser);
+        return true;
     }
 
     @Override

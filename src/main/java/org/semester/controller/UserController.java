@@ -2,10 +2,7 @@ package org.semester.controller;
 
 
 import lombok.AllArgsConstructor;
-import org.semester.dto.ErrorDto;
-import org.semester.dto.EventDto;
-import org.semester.dto.RegisterUserDto;
-import org.semester.dto.UserDto;
+import org.semester.dto.*;
 import org.semester.entity.User;
 import org.semester.service.UserService;
 import org.semester.util.StaticString;
@@ -147,8 +144,12 @@ public class UserController {
     @PatchMapping(
             consumes = MediaType.APPLICATION_JSON_VALUE
     )
-    public void updateUser(@RequestBody User user) {
-        userService.updateUser(user);
+    public ResponseEntity<?> updateUser(@RequestBody UserDto userDto, Principal principal) {
+        FullUserDto fullUserDto = userService.getFullUserByEmail(principal.getName());
+        if (!fullUserDto.getId().equals(userDto.getId())) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+        }
+        return ResponseEntity.ok(userService.updateUser(userDto));
     }
 
     @DeleteMapping

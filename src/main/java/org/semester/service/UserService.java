@@ -15,7 +15,7 @@ public interface UserService {
     UserDto findById(Long id);
     List<UserDto> getSusbcribers(Long id, Integer page);
     List<UserDto> getSubscribees(Long id, Integer page);
-    void updateUser(User user);
+    Boolean updateUser(UserDto userDto);
     void deleteUser(Long id);
     byte[] getProfileImage(Long id);
     byte[] getProfileImageByFileName(String fileName);

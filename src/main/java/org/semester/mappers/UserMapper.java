@@ -48,4 +48,15 @@ public class UserMapper {
                 .isBanned(fullUserDto.getIsBanned())
                 .build();
     }
+
+    public User getUserEntity(UserDto userDto) {
+        return User.builder()
+                .id(userDto.getId())
+                .name(userDto.getName())
+                .city(userDto.getCity())
+                .email(userDto.getEmail())
+                .age(userDto.getAge())
+                .userImage(userDto.getUserImage())
+                .build();
+    }
 }
