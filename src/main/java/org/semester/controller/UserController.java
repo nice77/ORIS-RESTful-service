@@ -68,6 +68,13 @@ public class UserController {
         return userService.getSubscribees(id, page);
     }
 
+    @PostMapping(
+            value = "/{id}/subscribe"
+    )
+    public Boolean subscribe(@PathVariable Long id, Principal principal) {
+        Long principalId = userService.getFullUserByEmail(principal.getName()).getId();
+        return userService.subscribe(id, principalId);
+    }
 
 
     @GetMapping("/{id}/subscribed-events")

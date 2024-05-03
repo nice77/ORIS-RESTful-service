@@ -115,6 +115,25 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     }
 
     @Override
+    public Boolean subscribe(Long idSubscribee, Long idSubscriber) {
+        Optional<User> foundSubscribee = userRepository.findById(idSubscribee);
+        User subscriber = userRepository.findById(idSubscriber).orElseThrow();
+        User subscribee;
+        if (foundSubscribee.isPresent()) {
+            subscribee = foundSubscribee.get();
+            if (subscribee.getSubscribers().contains(subscriber)) {
+                subscribee.getSubscribers().remove(subscriber);
+            } else {
+                subscribee.getSubscribers().add(subscriber);
+            }
+            userRepository.saveAndFlush(subscribee);
+        } else {
+            return false;
+        }
+        return true;
+    }
+
+    @Override
     public Boolean updateUser(UserDto userDto) {
         Optional<User> optionalUser = userRepository.findById(userDto.getId());
         if (optionalUser.isEmpty()) {
