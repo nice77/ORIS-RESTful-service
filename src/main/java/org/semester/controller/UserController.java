@@ -83,7 +83,7 @@ public class UserController {
     }
 
     @PostMapping("/event")
-    public ResponseEntity<?> subscribeToEvent(Principal principal, @RequestParam Long eventId) {
+    public ResponseEntity<?> subscribeToEvent(Principal principal, @RequestParam(name = "event_id") Long eventId) {
         if (userService.subscribeToEvent(principal.getName(), eventId)) {
             return ResponseEntity.ok().build();
         }
@@ -91,7 +91,7 @@ public class UserController {
     }
 
     @DeleteMapping("/event")
-    public ResponseEntity<?> unsubscribeFromEvent(Principal principal, @RequestParam Long eventId) {
+    public ResponseEntity<?> unsubscribeFromEvent(Principal principal, @RequestParam(name = "event_id") Long eventId) {
         if (userService.unsubscribeFromEvent(principal.getName(), eventId)) {
             return ResponseEntity.ok().build();
         }
