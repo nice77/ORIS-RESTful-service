@@ -2,14 +2,18 @@ package org.semester.service;
 
 import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
+import org.semester.dto.CommentDto;
 import org.semester.dto.eventDto.EventDto;
 import org.semester.dto.eventDto.OnCreateEventDto;
 import org.semester.dto.userDto.UserDto;
+import org.semester.entity.Comment;
 import org.semester.entity.Event;
 import org.semester.entity.EventImage;
 import org.semester.entity.User;
+import org.semester.mappers.CommentMapper;
 import org.semester.mappers.EventMapper;
 import org.semester.mappers.UserMapper;
+import org.semester.repository.CommentRepository;
 import org.semester.repository.EventImageRepository;
 import org.semester.repository.EventRepository;
 import org.semester.repository.UserRepository;
@@ -35,11 +39,15 @@ public class EventServiceImpl implements EventService {
     private EventRepository eventRepository;
     private EventImageRepository eventImageRepository;
     private UserRepository userRepository;
+    private CommentRepository commentRepository;
+
     private static final int PAGE_SIZE = 10;
     private Environment environment;
     private static final String envPath = "spring.servlet.multipart.location";
+
     private UserMapper userMapper;
     private EventMapper eventMapper;
+    private CommentMapper commentMapper;
 
     @Override
     public EventDto addEvent(OnCreateEventDto onCreateEventDto, String email) {
@@ -154,6 +162,27 @@ public class EventServiceImpl implements EventService {
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    @Override
+    public List<CommentDto> getComments(Long id, Integer page) {
+        Optional<Event> eventOptional = eventRepository.findById(id);
+        if (eventOptional.isEmpty()) {
+            return null;
+        }
+        return commentRepository.findCommentsByEventId(id, PageRequest.of(page, PAGE_SIZE)).stream().map(commentMapper::getCommentDto).toList();
+    }
+
+    @Override
+    public Boolean addComment(CommentDto commentDto, Long id, String email) {
+        User user = userRepository.findByEmail(email);
+        Event event = eventRepository.findById(id).orElseThrow();
+        if (user == null) {
+            return false;
+        }
+        Comment newComment = commentMapper.getComment(commentDto, event, user);
+        commentRepository.saveAndFlush(newComment);
+        return true;
     }
 
     private void deleteImageFromDisk(List<EventImage> images) {

@@ -1,11 +1,14 @@
 package org.semester.mappers;
 
+import lombok.AllArgsConstructor;
 import org.semester.dto.eventDto.EventDto;
 import org.semester.dto.eventDto.OnCreateEventDto;
 import org.semester.entity.Event;
 import org.semester.entity.EventImage;
 import org.semester.entity.User;
 import org.springframework.stereotype.Component;
+
+import java.util.Collections;
 
 @Component
 public class EventMapper {
@@ -33,6 +36,7 @@ public class EventMapper {
                 .date(onCreateEventDto.getDate())
                 .latitude(onCreateEventDto.getLatitude())
                 .longitude(onCreateEventDto.getLongitude())
+                .commentList(Collections.emptyList())
                 .build();
     }
 

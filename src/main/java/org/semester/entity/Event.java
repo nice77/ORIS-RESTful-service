@@ -1,12 +1,9 @@
 package org.semester.entity;
 
 
-import com.fasterxml.jackson.annotation.JsonRootName;
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import lombok.*;
 
 import jakarta.persistence.*;
-import org.springframework.boot.jackson.JsonComponent;
 
 import java.util.Date;
 import java.util.List;
@@ -39,4 +36,7 @@ public class Event {
 
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "event")
     private List<EventImage> eventImages;
+
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "event")
+    private List<Comment> commentList;
 }

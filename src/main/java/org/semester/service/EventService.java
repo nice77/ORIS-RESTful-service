@@ -1,5 +1,6 @@
 package org.semester.service;
 
+import org.semester.dto.CommentDto;
 import org.semester.dto.eventDto.EventDto;
 import org.semester.dto.eventDto.OnCreateEventDto;
 import org.semester.dto.userDto.UserDto;
@@ -20,4 +21,6 @@ public interface EventService {
     Boolean deleteImage(Long id);
     byte[] getImage(Long id, Integer number);
     byte[] getImage(String name);
+    List<CommentDto> getComments(Long id, Integer page);
+    Boolean addComment(CommentDto commentDto, Long eventId, String email);
 }

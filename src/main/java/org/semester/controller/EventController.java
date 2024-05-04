@@ -1,6 +1,7 @@
 package org.semester.controller;
 
 import lombok.AllArgsConstructor;
+import org.semester.dto.CommentDto;
 import org.semester.dto.eventDto.EventDto;
 import org.semester.dto.eventDto.OnCreateEventDto;
 import org.semester.dto.userDto.UserDto;
@@ -79,5 +80,17 @@ public class EventController {
     @GetMapping("/{id}/subscribers")
     public List<UserDto> getSubscribers(@PathVariable Long id, @RequestParam Integer page) {
         return eventService.getSubscribers(id, page);
+    }
+
+
+
+    @GetMapping("/{id}/comments")
+    public List<CommentDto> getComments(@PathVariable Long id, @RequestParam("page") Integer page) {
+        return eventService.getComments(id, page);
+    }
+
+    @PostMapping("/{id}/comments")
+    public Boolean addComment(@PathVariable Long id, @RequestBody CommentDto commentDto, Principal principal) {
+        return eventService.addComment(commentDto, id, principal.getName());
     }
 }

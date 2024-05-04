@@ -56,4 +56,7 @@ public class User {
 
     @Column(name = "is_banned")
     private Boolean isBanned;
+
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "user")
+    private List<Comment> commentList;
 }

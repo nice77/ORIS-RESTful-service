@@ -2,6 +2,8 @@ package org.semester.dto.eventDto;
 
 
 import lombok.*;
+import org.semester.dto.CommentDto;
+import org.semester.entity.Comment;
 
 import java.util.Date;
 import java.util.List;
