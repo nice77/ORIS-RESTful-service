@@ -15,21 +15,21 @@ public interface UserRepository extends JpaRepository<User, Long> {
 
     @Query(
             value = "SELECT users.* FROM users " +
-                    "JOIN users_subscriptions ON users_subscriptions.subscribee_id = users.id " +
+                    "JOIN users_subscriptions ON users_subscriptions.subscriber_id = users.id " +
                     "WHERE users.id = :id",
             countQuery = "SELECT count(*) FROM users " +
-                    "JOIN users_subscriptions ON users.id = users_subscriptions.subscribee_id " +
+                    "JOIN users_subscriptions ON users.id = users_subscriptions.subscriber_id " +
                     "WHERE users.id = :id",
             nativeQuery = true
     )
-    List<User> findSubscribees(Long id, Pageable pageable);
+    List<User> findAuthors(Long id, Pageable pageable);
 
     @Query(
             value = "SELECT users.* FROM users " +
-                    "JOIN users_subscriptions ON users_subscriptions.subscription_id = users.id " +
+                    "JOIN users_subscriptions ON users_subscriptions.author_id = users.id " +
                     "WHERE users.id = :id",
             countQuery = "SELECT count(*) FROM users " +
-                    "JOIN users_subscriptions ON users.id = users_subscriptions.subscription_id " +
+                    "JOIN users_subscriptions ON users.id = users_subscriptions.author_id " +
                     "WHERE users.id = :id",
             nativeQuery = true
     )

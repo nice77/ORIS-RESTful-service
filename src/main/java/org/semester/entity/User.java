@@ -43,8 +43,8 @@ public class User {
     @ManyToMany
     @JoinTable(
             name = "users_subscriptions",
-            joinColumns = @JoinColumn(name = "subscribee_id"),
-            inverseJoinColumns = @JoinColumn(name = "subscription_id")
+            joinColumns = @JoinColumn(name = "author_id"),
+            inverseJoinColumns = @JoinColumn(name = "subscriber_id")
     )
     private List<User> subscribers;
 

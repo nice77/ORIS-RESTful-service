@@ -108,28 +108,22 @@ public class UserServiceImpl implements UserService, UserDetailsService {
 
     @Override
     public List<UserDto> getSubscribees(Long id, Integer page) {
-        return userRepository.findSubscribees(id, PageRequest.of(page, PAGE_SIZE))
+        return userRepository.findAuthors(id, PageRequest.of(page, PAGE_SIZE))
                 .stream()
                 .map(userMapper::getUserDto)
                 .collect(Collectors.toList());
     }
 
     @Override
-    public Boolean subscribe(Long idSubscribee, Long idSubscriber) {
-        Optional<User> foundSubscribee = userRepository.findById(idSubscribee);
+    public Boolean subscribe(Long idAuthor, Long idSubscriber) {
+        User author = userRepository.findById(idAuthor).orElseThrow();
         User subscriber = userRepository.findById(idSubscriber).orElseThrow();
-        User subscribee;
-        if (foundSubscribee.isPresent()) {
-            subscribee = foundSubscribee.get();
-            if (subscribee.getSubscribers().contains(subscriber)) {
-                subscribee.getSubscribers().remove(subscriber);
-            } else {
-                subscribee.getSubscribers().add(subscriber);
-            }
-            userRepository.saveAndFlush(subscribee);
+        if (author.getSubscribers().contains(subscriber)) {
+            author.getSubscribers().remove(subscriber);
         } else {
-            return false;
+            author.getSubscribers().add(subscriber);
         }
+        userRepository.saveAndFlush(author);
         return true;
     }
 
