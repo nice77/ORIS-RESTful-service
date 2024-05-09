@@ -33,6 +33,8 @@ public class UserMapper {
                 .email(user.getEmail())
                 .age(user.getAge())
                 .userImage("users/user-image/" + user.getUserImage())
+                .subscribersCount(user.getSubscribers().size())
+                .authorsCount(user.getAuthors().size())
                 .build();
     }
 

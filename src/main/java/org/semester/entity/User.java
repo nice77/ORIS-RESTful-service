@@ -2,6 +2,7 @@ package org.semester.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.BatchSize;
 
 import java.util.List;
 
@@ -47,6 +48,15 @@ public class User {
             inverseJoinColumns = @JoinColumn(name = "subscriber_id")
     )
     private List<User> subscribers;
+
+    @ToString.Exclude
+    @ManyToMany
+    @JoinTable(
+            name = "users_subscriptions",
+            joinColumns = @JoinColumn(name = "subscriber_id"),
+            inverseJoinColumns = @JoinColumn(name = "author_id")
+    )
+    private List<User> authors;
 
     private String userImage;
 

@@ -238,11 +238,47 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     }
 
     @Override
-    public List<EventDto> getSubscribedEvents(Long id) {
-        Optional<User> optionalUser = userRepository.findById(id);
-        return optionalUser.map(user -> user.getSubscribedEvents().stream()
+    public List<EventDto> getSubscribedEvents(Long id, Integer page) {
+        User user = userRepository.findById(id).orElseThrow();
+        int startIndex = PAGE_SIZE * page;
+        int endIndex = PAGE_SIZE * (page + 1);
+        if (endIndex > user.getSubscribedEvents().size()) {
+            if (startIndex > user.getSubscribedEvents().size()) {
+                return List.of();
+            }
+            int currSize = user.getSubscribedEvents().size();
+            if (currSize == 0) {
+                return List.of();
+            }
+            return user.getSubscribedEvents().subList(startIndex, currSize).stream()
+                    .map(eventMapper::getEventDto)
+                    .toList();
+        }
+        return user.getSubscribedEvents().subList(startIndex, endIndex).stream()
                 .map(eventMapper::getEventDto)
-                .toList()).orElse(null);
+                .toList();
+    }
+
+    @Override
+    public List<EventDto> getCreatedEvents(Long id, Integer page) {
+        User user = userRepository.findById(id).orElseThrow();
+        int startIndex = PAGE_SIZE * page;
+        int endIndex = PAGE_SIZE * (page + 1);
+        if (endIndex > user.getEventList().size()) {
+            if (startIndex > user.getEventList().size()) {
+                return List.of();
+            }
+            int currSize = user.getEventList().size();
+            if (currSize == 0) {
+                return List.of();
+            }
+            return user.getEventList().subList(startIndex, currSize).stream()
+                    .map(eventMapper::getEventDto)
+                    .toList();
+        }
+        return user.getEventList().subList(startIndex, endIndex).stream()
+                .map(eventMapper::getEventDto)
+                .toList();
     }
 
     @Override
