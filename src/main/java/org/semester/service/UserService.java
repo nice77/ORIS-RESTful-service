@@ -27,7 +27,8 @@ public interface UserService {
     Boolean deleteProfileImage(String userEmail);
     Boolean subscribeToEvent(String email, Long eventId);
     Boolean unsubscribeFromEvent(String email, Long eventId);
-    List<EventDto> getSubscribedEvents(Long id);
+    List<EventDto> getSubscribedEvents(Long id, Integer page);
+    List<EventDto> getCreatedEvents(Long id, Integer page);
     String getPassword(String email);
     RoleDto getRole(String email);
     Boolean changeIsBanned(Long id);

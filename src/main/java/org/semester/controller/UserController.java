@@ -76,10 +76,14 @@ public class UserController {
         return userService.subscribe(id, principalId);
     }
 
+    @GetMapping("/{id}/created-events")
+    public List<EventDto> getCreatedEvents(@PathVariable Long id, @RequestParam Integer page) {
+        return userService.getCreatedEvents(id, page);
+    }
 
     @GetMapping("/{id}/subscribed-events")
-    public List<EventDto> getSubscribedEvents(@PathVariable Long id) {
-        return userService.getSubscribedEvents(id);
+    public List<EventDto> getSubscribedEvents(@PathVariable Long id, @RequestParam Integer page) {
+        return userService.getSubscribedEvents(id, page);
     }
 
     @PostMapping("/event")
