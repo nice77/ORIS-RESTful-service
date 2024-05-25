@@ -69,11 +69,14 @@ public class AuthenticationController {
             consumes = MediaType.APPLICATION_JSON_VALUE,
             produces = MediaType.APPLICATION_JSON_VALUE
     )
-    public ResponseEntity<?> refresh_tokens(@RequestBody RefreshRequest request) {
+    public ResponseEntity<Object> refresh_tokens(@RequestBody RefreshRequest request) {
         Token found =
                 tokenService.getToken(
                         request.getRefresh()
                 );
+        if (found == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
         if (found.getIsRevoked()) {
             ErrorDto error = new ErrorDto(StaticString.USED_TOKEN.getValue());
             return new ResponseEntity<>(error, HttpStatus.UNAUTHORIZED);

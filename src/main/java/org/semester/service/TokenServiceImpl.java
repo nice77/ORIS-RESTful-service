@@ -13,9 +13,9 @@ public class TokenServiceImpl implements TokenService {
     private TokenRepository tokenRepository;
 
     @Override
-    public Boolean checkIfTokenRevoked(Token token) {
-        Token foundToken = tokenRepository.findByToken(token.getToken());
-        return foundToken != null;
+    public Boolean checkIfTokenRevoked(Long tokenId) {
+        Token foundToken = tokenRepository.findById(tokenId).orElseThrow();
+        return foundToken.getIsRevoked();
     }
 
     @Override
@@ -30,7 +30,6 @@ public class TokenServiceImpl implements TokenService {
 
     @Override
     public void updateToken(Token token) {
-//        tokenRepository.updateTokenById(token.getId(), token.getIsRevoked());
         tokenRepository.save(token);
     }
 
