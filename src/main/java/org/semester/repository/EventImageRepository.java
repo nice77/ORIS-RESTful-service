@@ -9,4 +9,8 @@ public interface EventImageRepository extends JpaRepository<EventImage, Long> {
     @Modifying
     @Query(nativeQuery = true, value = "DELETE FROM event_image WHERE event_id = :eventId")
     void deleteByEventId(Long eventId);
+
+    @Modifying
+    @Query(nativeQuery = true, value = "DELETE FROM event_image WHERE path = :path")
+    void deleteByPath(String path);
 }

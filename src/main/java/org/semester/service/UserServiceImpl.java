@@ -50,9 +50,10 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     @Override
     public Map<String, String> addUser(RegisterUserDto registerUserDto) {
         User newUser = User.builder().build();
+        newUser.setName(registerUserDto.getName());
         newUser.setEmail(registerUserDto.getEmail());
         newUser.setPassword((new BCryptPasswordEncoder()).encode(registerUserDto.getPassword()));
-        newUser.setUserImage("default.jpg");
+        newUser.setUserImage("default.png");
         Role role = Role.builder()
                 .id(1L)
                 .role("ROLE_USER")
@@ -128,18 +129,19 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     }
 
     @Override
-    public Boolean updateUser(UserDto userDto) {
-        Optional<User> optionalUser = userRepository.findById(userDto.getId());
-        if (optionalUser.isEmpty()) {
-            return false;
-        }
-        User newUser = userMapper.getUserEntity(userDto);
-        User foundUser = optionalUser.get();
-        newUser.setPassword(foundUser.getPassword());
-        newUser.setRole(foundUser.getRole());
-        newUser.setIsBanned(foundUser.getIsBanned());
+    public Boolean amISubscribedToUser(Long idAuthor, Long idSubscriber) {
+        User author = userRepository.findById(idAuthor).orElseThrow();
+        User subscriber = userRepository.findById(idSubscriber).orElseThrow();
+        return author.getSubscribers().contains(subscriber);
+    }
 
-        userRepository.saveAndFlush(newUser);
+    @Override
+    public Boolean updateUser(UserDto userDto) {
+        User user = userRepository.findById(userDto.getId()).orElseThrow();
+        user.setName(userDto.getName());
+        user.setAge(userDto.getAge());
+        user.setCity(userDto.getCity());
+        userRepository.saveAndFlush(user);
         return true;
     }
 
@@ -174,23 +176,26 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     }
 
     @Override
-    public Boolean addProfileImage(MultipartFile file, String userEmail) {
+    public String addProfileImage(MultipartFile file, String userEmail) {
         if (!file.getContentType().equals("image/png")
                 && !file.getContentType().equals("image/jpg")
                 && !file.getContentType().equals("image/jpeg")
         ) {
-            return false;
+            throw new RuntimeException();
         }
         try {
             String type = (file.getContentType().equals("image/png")) ? "png" : "jpg";
             String name = UUID.randomUUID() + "." + type;
             User user = userRepository.findByEmail(userEmail);
+            if (!user.getUserImage().equals("default.png")) {
+                deleteProfileImage(user.getEmail());
+            }
             user.setUserImage(name);
             userRepository.saveAndFlush(user);
             file.transferTo(new File(environment.getProperty(envPath) + name));
-            return true;
+            return name;
         } catch (IOException e) {
-            return false;
+            throw new RuntimeException(e);
         }
     }
 
@@ -205,16 +210,16 @@ public class UserServiceImpl implements UserService, UserDetailsService {
         } catch (IOException e) {
             return false;
         }
-        user.setUserImage(null);
+        user.setUserImage("default.png");
         userRepository.saveAndFlush(user);
         return true;
     }
 
     @Override
-    public Boolean subscribeToEvent(String email, Long eventId) {
+    public Boolean manageSubscriptionToEvent(String email, Long eventId) {
         User user = userRepository.findByEmail(email);
         if (user.getSubscribedEvents().stream().anyMatch(event -> Objects.equals(event.getId(), eventId))) {
-            return false;
+            return unsubscribeFromEvent(email, eventId);
         }
         Optional<Event> event = eventRepository.findById(eventId);
         if (event.isEmpty()) {
@@ -257,6 +262,11 @@ public class UserServiceImpl implements UserService, UserDetailsService {
         return user.getSubscribedEvents().subList(startIndex, endIndex).stream()
                 .map(eventMapper::getEventDto)
                 .toList();
+    }
+
+    @Override
+    public Boolean amISubscribedToEvent(String email, Long eventId) {
+        return userRepository.amISubscribedToEvent(userRepository.findByEmail(email).getId(), eventId);
     }
 
     @Override

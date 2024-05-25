@@ -16,6 +16,8 @@ spring:
     multipart:
       enabled: true
       location: C:\profileImages\
+      max-file-size: 50MB
+      max-request-size: 50MB
 jwt:
   secret: keklolkeklolkeklolkeklolkeklolkeklolkeklolkeklolkeklolkeklolkeklolkeklol
   lifetime: 5m

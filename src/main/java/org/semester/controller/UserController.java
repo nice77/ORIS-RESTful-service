@@ -81,6 +81,14 @@ public class UserController {
         return userService.subscribe(id, principalId);
     }
 
+    @GetMapping(
+            value = "/{id}/subscription"
+    )
+    public Boolean amISubscribedToUser(@PathVariable Long id, Principal principal) {
+        Long principalId = userService.getFullUserByEmail(principal.getName()).getId();
+        return userService.amISubscribedToUser(id, principalId);
+    }
+
     @GetMapping("/{id}/created-events")
     public List<EventDto> getCreatedEvents(@PathVariable Long id, @RequestParam Integer page) {
         return userService.getCreatedEvents(id, page);
@@ -91,9 +99,14 @@ public class UserController {
         return userService.getSubscribedEvents(id, page);
     }
 
+    @GetMapping("/event")
+    public Boolean amISubscribedToEvent(Principal principal, @RequestParam(name = "event_id") Long eventId) {
+        return userService.amISubscribedToEvent(principal.getName(), eventId);
+    }
+
     @PostMapping("/event")
     public ResponseEntity<?> subscribeToEvent(Principal principal, @RequestParam(name = "event_id") Long eventId) {
-        if (userService.subscribeToEvent(principal.getName(), eventId)) {
+        if (userService.manageSubscriptionToEvent(principal.getName(), eventId)) {
             return ResponseEntity.ok().build();
         }
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
@@ -101,7 +114,7 @@ public class UserController {
 
     @DeleteMapping("/event")
     public ResponseEntity<?> unsubscribeFromEvent(Principal principal, @RequestParam(name = "event_id") Long eventId) {
-        if (userService.unsubscribeFromEvent(principal.getName(), eventId)) {
+        if (userService.manageSubscriptionToEvent(principal.getName(), eventId)) {
             return ResponseEntity.ok().build();
         }
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
@@ -127,14 +140,9 @@ public class UserController {
         }
     }
 
-    @PostMapping("/user-image")
-    public ResponseEntity<?> addProfileImage(MultipartFile file, Principal principal) {
-        if (userService.addProfileImage(file, principal.getName())) {
-            System.out.println("Returnin image");
-            return ResponseEntity.ok().build();
-        }
-        System.out.println("Not returnin image");
-        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+    @PostMapping(value = "/user-image", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<String> addProfileImage(MultipartFile file, Principal principal) {
+        return ResponseEntity.ok("\"" + userService.addProfileImage(file, principal.getName()) + "\"");
     }
 
     @DeleteMapping("/user-image")

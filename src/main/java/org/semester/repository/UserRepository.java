@@ -34,4 +34,13 @@ public interface UserRepository extends JpaRepository<User, Long> {
             nativeQuery = true
     )
     List<User> findSubscribers(Long id, Pageable pageable);
+
+
+    @Query(
+            nativeQuery = true,
+            value = "select count(*) = 1 from users u " +
+                    "join public.users_events_subscriptions us on u.id = us.user_id " +
+                    "where us.event_id = :eventId and u.id = :userId"
+    )
+    Boolean amISubscribedToEvent(Long userId, Long eventId);
 }

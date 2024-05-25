@@ -2,12 +2,14 @@ package org.semester.controller;
 
 import lombok.AllArgsConstructor;
 import org.semester.dto.CommentDto;
+import org.semester.dto.OnAddCommentDto;
 import org.semester.dto.eventDto.EventDto;
 import org.semester.dto.eventDto.OnCreateEventDto;
+import org.semester.dto.eventDto.OnUpdateEventDto;
 import org.semester.dto.userDto.UserDto;
-import org.semester.entity.Event;
 import org.semester.service.EventService;
 import org.semester.service.UserService;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -15,6 +17,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.security.Principal;
+import java.util.Arrays;
 import java.util.List;
 
 
@@ -24,7 +27,6 @@ import java.util.List;
 public class EventController {
 
     private EventService eventService;
-    private UserService userService;
 
     @GetMapping("/{id}")
     public EventDto getEvent(@PathVariable Long id) {
@@ -54,17 +56,34 @@ public class EventController {
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
     }
 
-    @PostMapping("/{id}/event-image")
-    public Boolean addImage(@PathVariable Long id, MultipartFile file, Principal principal) {
+    @PostMapping(value = "/{id}/event-image", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public Boolean addImage(@PathVariable Long id, @RequestBody MultipartFile file, Principal principal) {
         return eventService.addImage(id, file, principal.getName());
     }
 
+//    @PostMapping(value = "/{id}/event-image", params = {"fileList"})
+//    public void loadImages(@PathVariable Long id, @RequestParam("fileList") List<MultipartFile> fileList, Principal principal) {
+//        EventDto eventDto = eventService.findById(id);
+//        fileList.forEach(file -> eventService.addImage(eventDto.getId(), file, principal.getName()));
+//    }
+
+    @PatchMapping()
+    public void updateEvent(Principal principal, @RequestBody OnUpdateEventDto onUpdateEventDto) {
+        eventService.updateEvent(onUpdateEventDto, principal.getName());
+    }
+
+//    @DeleteMapping("/{id}/event-image")
+//    public ResponseEntity<?> deleteImages(@PathVariable Long id) {
+//        if (eventService.deleteImages(id)) {
+//            return ResponseEntity.ok().build();
+//        }
+//        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+//    }
+
     @DeleteMapping("/{id}/event-image")
-    public ResponseEntity<?> deleteImage(@PathVariable Long id) {
-        if (eventService.deleteImage(id)) {
-            return ResponseEntity.ok().build();
-        }
-        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+    public void deleteImage(@PathVariable Long id, Principal principal, @RequestBody List<String> imageNameList) {
+        System.out.println("Deleting image");
+        eventService.deleteImagesByName(imageNameList);
     }
 
     @GetMapping(value = "/{id}/event-image", produces = MediaType.IMAGE_PNG_VALUE)
@@ -90,7 +109,7 @@ public class EventController {
     }
 
     @PostMapping("/{id}/comments")
-    public Boolean addComment(@PathVariable Long id, @RequestBody CommentDto commentDto, Principal principal) {
-        return eventService.addComment(commentDto, id, principal.getName());
+    public CommentDto addComment(@PathVariable Long id, @RequestBody OnAddCommentDto onAddCommentDto, Principal principal) {
+        return eventService.addComment(onAddCommentDto, id, principal.getName());
     }
 }

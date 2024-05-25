@@ -9,11 +9,16 @@ import org.semester.entity.User;
 import org.springframework.stereotype.Component;
 
 import java.util.Collections;
+import java.util.List;
 
 @Component
 public class EventMapper {
 
     public EventDto getEventDto(Event event) {
+        List<EventImage> eventImages = event.getEventImages();
+        if (eventImages == null) {
+            eventImages = Collections.emptyList();
+        }
         return EventDto.builder()
                 .id(event.getId())
                 .name(event.getName())
@@ -22,7 +27,7 @@ public class EventMapper {
                 .date(event.getDate())
                 .latitude(event.getLatitude())
                 .longitude(event.getLongitude())
-                .eventImages(event.getEventImages().stream().map( path ->
+                .eventImages(eventImages.stream().map( path ->
                         "events/event-image/" + path.getPath()
                 ).toList())
                 .build();

@@ -1,10 +1,8 @@
 package org.semester.dto.eventDto;
 
-
 import lombok.*;
 
 import java.util.Date;
-import java.util.List;
 
 @NoArgsConstructor
 @AllArgsConstructor
@@ -12,13 +10,11 @@ import java.util.List;
 @Setter
 @Builder
 @ToString
-public class EventDto {
+public class OnUpdateEventDto {
     private Long id;
     private Date date;
     private String name;
     private String description;
     private Double latitude;
     private Double longitude;
-    private Long authorId;
-    private List<String> eventImages;
 }

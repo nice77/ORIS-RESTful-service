@@ -16,5 +16,4 @@ public class OnCreateEventDto {
     private String description;
     private Double latitude;
     private Double longitude;
-    private Long authorId;
 }

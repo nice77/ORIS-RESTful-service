@@ -3,8 +3,10 @@ package org.semester.service;
 import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
 import org.semester.dto.CommentDto;
+import org.semester.dto.OnAddCommentDto;
 import org.semester.dto.eventDto.EventDto;
 import org.semester.dto.eventDto.OnCreateEventDto;
+import org.semester.dto.eventDto.OnUpdateEventDto;
 import org.semester.dto.userDto.UserDto;
 import org.semester.entity.Comment;
 import org.semester.entity.Event;
@@ -90,6 +92,22 @@ public class EventServiceImpl implements EventService {
     }
 
     @Override
+    public Boolean updateEvent(OnUpdateEventDto onUpdateEventDto, String email) {
+        User user = userRepository.findByEmail(email);
+        Event oldEvent = eventRepository.findById(onUpdateEventDto.getId()).orElseThrow();
+        if (!user.getEventList().contains(oldEvent)) {
+            throw new RuntimeException();
+        }
+        oldEvent.setName(onUpdateEventDto.getName());
+        oldEvent.setDescription(onUpdateEventDto.getDescription());
+        oldEvent.setDate(onUpdateEventDto.getDate());
+        oldEvent.setLatitude(onUpdateEventDto.getLatitude());
+        oldEvent.setLongitude(onUpdateEventDto.getLongitude());
+        eventRepository.saveAndFlush(oldEvent);
+        return true;
+    }
+
+    @Override
     @Transactional
     public Boolean deleteEvent(Long id) {
         Optional<Event> eventOptional = eventRepository.findById(id);
@@ -104,6 +122,7 @@ public class EventServiceImpl implements EventService {
 
     @Override
     public Boolean addImage(Long id, MultipartFile file, String email) {
+        System.out.println("Called method 2");
         Event event = eventRepository.findById(id).orElseThrow();
         User user = userRepository.findByEmail(email);
         if (event.getAuthor().getId() != user.getId()) {
@@ -128,7 +147,7 @@ public class EventServiceImpl implements EventService {
 
     @Override
     @Transactional
-    public Boolean deleteImage(Long id) {
+    public Boolean deleteImages(Long id) {
         Optional<Event> eventOptional = eventRepository.findById(id);
         if (eventOptional.isEmpty()) {
             return false;
@@ -142,6 +161,21 @@ public class EventServiceImpl implements EventService {
         }
         eventImageRepository.deleteByEventId(id);
         return true;
+    }
+
+    @Override
+    @Transactional
+    public void deleteImagesByName(List<String> names) {
+        List<String> updatedNames = names.stream().map(name -> {
+            String[] path = name.split("/");
+            return path[path.length - 1];
+        }).toList();
+        updatedNames.forEach(eventImageRepository::deleteByPath);
+        try {
+            deleteImageFromDiskByNames(updatedNames);
+        } catch (RuntimeException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @Override
@@ -166,29 +200,36 @@ public class EventServiceImpl implements EventService {
 
     @Override
     public List<CommentDto> getComments(Long id, Integer page) {
-        Optional<Event> eventOptional = eventRepository.findById(id);
-        if (eventOptional.isEmpty()) {
-            return null;
-        }
-        return commentRepository.findCommentsByEventId(id, PageRequest.of(page, PAGE_SIZE)).stream().map(commentMapper::getCommentDto).toList();
+        eventRepository.findById(id).orElseThrow();
+        return commentRepository.findCommentsByEventIdOrderByDateDesc(id, PageRequest.of(page, PAGE_SIZE)).stream().map(commentMapper::getCommentDto).toList();
     }
 
     @Override
-    public Boolean addComment(CommentDto commentDto, Long id, String email) {
+    public CommentDto addComment(OnAddCommentDto onAddCommentDto, Long eventId, String email) {
         User user = userRepository.findByEmail(email);
-        Event event = eventRepository.findById(id).orElseThrow();
+        Event event = eventRepository.findById(eventId).orElseThrow();
         if (user == null) {
-            return false;
+            throw new RuntimeException();
         }
-        Comment newComment = commentMapper.getComment(commentDto, event, user);
-        commentRepository.saveAndFlush(newComment);
-        return true;
+        Comment newComment = commentMapper.getComment(onAddCommentDto, event, user);
+        return commentMapper.getCommentDto(commentRepository.saveAndFlush(newComment));
     }
 
     private void deleteImageFromDisk(List<EventImage> images) {
         images.forEach(eventImage -> {
             try {
                 String fullPath = environment.getProperty(envPath) + "/events/" + eventImage.getPath();
+                Files.delete(Path.of(fullPath));
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        });
+    }
+
+    private void deleteImageFromDiskByNames(List<String> images) {
+        images.forEach(eventImage -> {
+            try {
+                String fullPath = environment.getProperty(envPath) + "/events/" + eventImage;
                 Files.delete(Path.of(fullPath));
             } catch (IOException e) {
                 throw new RuntimeException(e);
