@@ -20,7 +20,7 @@ public class TokenServiceImpl implements TokenService {
 
     @Override
     public Token addToken(Token token) {
-        return tokenRepository.saveAndFlush(token);
+        return tokenRepository.save(token);
     }
 
     @Override

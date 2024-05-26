@@ -58,9 +58,9 @@ public class AuthenticationController {
         String role = fullUserDto.getRole().getRole();
         Map<String, String> tokens = tokenUtil.generatePair(email, role);
         tokenService.addToken(Token.builder()
-                .token(tokens.get("refresh"))
-                .isRevoked(false)
-                .build());
+                        .token(tokens.get("refresh"))
+                        .isRevoked(false)
+                        .build());
         return ResponseEntity.ok(tokens);
     }
 
