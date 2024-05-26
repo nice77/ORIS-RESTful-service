@@ -61,24 +61,10 @@ public class EventController {
         return eventService.addImage(id, file, principal.getName());
     }
 
-//    @PostMapping(value = "/{id}/event-image", params = {"fileList"})
-//    public void loadImages(@PathVariable Long id, @RequestParam("fileList") List<MultipartFile> fileList, Principal principal) {
-//        EventDto eventDto = eventService.findById(id);
-//        fileList.forEach(file -> eventService.addImage(eventDto.getId(), file, principal.getName()));
-//    }
-
     @PatchMapping()
     public void updateEvent(Principal principal, @RequestBody OnUpdateEventDto onUpdateEventDto) {
         eventService.updateEvent(onUpdateEventDto, principal.getName());
     }
-
-//    @DeleteMapping("/{id}/event-image")
-//    public ResponseEntity<?> deleteImages(@PathVariable Long id) {
-//        if (eventService.deleteImages(id)) {
-//            return ResponseEntity.ok().build();
-//        }
-//        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
-//    }
 
     @DeleteMapping("/{id}/event-image")
     public void deleteImage(@PathVariable Long id, Principal principal, @RequestBody List<String> imageNameList) {

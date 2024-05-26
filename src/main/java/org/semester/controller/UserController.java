@@ -134,8 +134,10 @@ public class UserController {
     @GetMapping(value = "/user-image/{fileName}", produces = {MediaType.IMAGE_PNG_VALUE, MediaType.IMAGE_JPEG_VALUE})
     public ResponseEntity<?> getUserImage(@PathVariable("fileName") String fileName) {
         try {
+            System.out.println(1);
             return ResponseEntity.ok(userService.getProfileImageByFileName(fileName));
         } catch (Exception e) {
+            e.printStackTrace();
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }

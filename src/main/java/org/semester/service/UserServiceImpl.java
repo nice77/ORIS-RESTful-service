@@ -169,7 +169,8 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     @Override
     public byte[] getProfileImageByFileName(String fileName) {
         try {
-            return Files.readAllBytes(Path.of(environment.getProperty(envPath) + fileName));
+            File file = new File(environment.getProperty(envPath) + fileName);
+            return Files.readAllBytes(file.toPath());
         } catch (IOException e) {
             throw new RuntimeException(e);
         }

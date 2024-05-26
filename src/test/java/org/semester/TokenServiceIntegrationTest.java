@@ -11,7 +11,7 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.springframework.test.util.AssertionErrors.assertNotNull;
 
 @SpringBootTest(classes = Main.class, webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-@TestPropertySource(properties = {"spring.config.location=classpath:/application.yaml"})
+@TestPropertySource(properties = {"spring.config.location=classpath:/application-test.properties"})
 public class TokenServiceIntegrationTest {
 
     @Autowired
@@ -31,12 +31,12 @@ public class TokenServiceIntegrationTest {
 
     @Test
     void testCheckIfRevoked() throws Exception {
-        assertEquals(false, tokenService.checkIfTokenRevoked(1206L));
+        assertEquals(false, tokenService.checkIfTokenRevoked(2L));
     }
 
     @Test
     void testUpdateToken() throws Exception {
-        String tokenString = "eyJhbGciOiJIUzI1NiJ9.eyJyb2xlIjoiUk9MRV9BRE1JTiIsInR5cGUiOiJyZWZyZXNoIiwiZW1haWwiOiIxQGdtYWlsLmNvbSIsImlhdCI6MTcxNjY1NDc1NSwiZXhwIjoxNzE2NzQxMTU1fQ.U_o7NXkTcsXp4taSF1ccM2Po2_cr4C1cNWE1RZcNRKY";
+        String tokenString = "eyJhbGciOiJIUzI1NiJ9.eyJyb2xlIjoiUk9MRV9BRE1JTikiLCJ0eXBlIjoicmVmcmVzaCIsImVtYWlsIjoiMUBnbWFpbC5jb20iLCJpYXQiOjE3MTY3MzA4NzMsImV4cCI6MTcxNjgxNzI3M30.tV6ryfGjWWPvklkVAtySj5ScJA-mwZLpLNiWRJSYr1Y";
         Token foundToken = tokenService.getToken(tokenString);
         Boolean currentState = foundToken.getIsRevoked();
         foundToken.setIsRevoked(!currentState);

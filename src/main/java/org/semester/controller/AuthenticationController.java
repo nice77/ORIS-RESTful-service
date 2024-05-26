@@ -40,7 +40,6 @@ public class AuthenticationController {
     )
     public ResponseEntity<Object> authenticate(@RequestBody AuthorizeRequest request) {
         FullUserDto fullUserDto = userService.getFullUserByEmail(request.getEmail());
-        System.out.println("FullUserDto: " + fullUserDto);
         if (fullUserDto == null) {
             ErrorDto error = new ErrorDto(StaticString.WRONG_CREDENTIALS.getValue());
             return new ResponseEntity<>(error, HttpStatus.UNAUTHORIZED);
