@@ -9,12 +9,12 @@ import org.semester.dto.userDto.FullUserDto;
 import org.semester.dto.authServiceDto.AuthorizeRequest;
 import org.semester.dto.authServiceDto.RefreshRequest;
 import org.semester.entity.Token;
-import org.semester.dto.ErrorDto;
+import org.semester.exceptionHandler.exception.BadTokenException;
+import org.semester.exceptionHandler.exception.WrongCredentialsException;
 import org.semester.service.TokenService;
 import org.semester.service.UserService;
 import org.semester.util.StaticString;
 import org.semester.util.TokenUtil;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -38,20 +38,17 @@ public class AuthenticationController {
             consumes = MediaType.APPLICATION_JSON_VALUE,
             produces = MediaType.APPLICATION_JSON_VALUE
     )
-    public ResponseEntity<Object> authenticate(@RequestBody AuthorizeRequest request) {
+    public ResponseEntity<Object> authenticate(@RequestBody AuthorizeRequest request) throws WrongCredentialsException {
         FullUserDto fullUserDto = userService.getFullUserByEmail(request.getEmail());
         if (fullUserDto == null) {
-            ErrorDto error = new ErrorDto(StaticString.WRONG_CREDENTIALS.getValue());
-            return new ResponseEntity<>(error, HttpStatus.UNAUTHORIZED);
+            throw new WrongCredentialsException(StaticString.WRONG_CREDENTIALS.getValue());
         }
         boolean isPasswordCorrect = passwordEncoder.matches(request.getPassword(), userService.getPassword(fullUserDto.getEmail()));
         if (!isPasswordCorrect) {
-            ErrorDto error = new ErrorDto(StaticString.WRONG_CREDENTIALS.getValue());
-            return new ResponseEntity<>(error, HttpStatus.UNAUTHORIZED);
+            throw new WrongCredentialsException(StaticString.WRONG_CREDENTIALS.getValue());
         }
         if (fullUserDto.getIsBanned()) {
-            ErrorDto error = new ErrorDto(StaticString.BANNED.getValue());
-            return new ResponseEntity<>(error, HttpStatus.UNAUTHORIZED);
+            throw new WrongCredentialsException(StaticString.BANNED.getValue());
         }
         String email = request.getEmail();
         String role = fullUserDto.getRole().getRole();
@@ -68,17 +65,13 @@ public class AuthenticationController {
             consumes = MediaType.APPLICATION_JSON_VALUE,
             produces = MediaType.APPLICATION_JSON_VALUE
     )
-    public ResponseEntity<Object> refresh_tokens(@RequestBody RefreshRequest request) {
+    public ResponseEntity<Object> refresh_tokens(@RequestBody RefreshRequest request) throws BadTokenException {
         Token found =
                 tokenService.getToken(
                         request.getRefresh()
                 );
-        if (found == null) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
-        }
         if (found.getIsRevoked()) {
-            ErrorDto error = new ErrorDto(StaticString.USED_TOKEN.getValue());
-            return new ResponseEntity<>(error, HttpStatus.UNAUTHORIZED);
+            throw new BadTokenException(StaticString.USED_TOKEN.getValue());
         }
         String email;
         String role;
@@ -87,11 +80,9 @@ public class AuthenticationController {
             email = tokenUtil.getEmail(jwt);
             role = tokenUtil.getRole(jwt);
         } catch (ExpiredJwtException e) {
-            ErrorDto error = new ErrorDto(StaticString.EXPIRED_TOKEN.getValue());
-            return new ResponseEntity<>(error, HttpStatus.UNAUTHORIZED);
+            throw new BadTokenException(StaticString.EXPIRED_TOKEN.getValue());
         } catch (SignatureException | MalformedJwtException e) {
-            ErrorDto error = new ErrorDto(StaticString.BAD_TOKEN.getValue());
-            return new ResponseEntity<>(error, HttpStatus.UNAUTHORIZED);
+            throw new BadTokenException(StaticString.BAD_TOKEN.getValue());
         }
         found.setIsRevoked(true);
         tokenService.updateToken(found);

@@ -31,6 +31,8 @@ import java.nio.file.Path;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import static org.semester.util.StaticString.*;
+
 
 @Service
 @AllArgsConstructor
@@ -49,19 +51,20 @@ public class UserServiceImpl implements UserService, UserDetailsService {
 
     @Override
     public Map<String, String> addUser(RegisterUserDto registerUserDto) {
-        User newUser = User.builder().build();
-        newUser.setName(registerUserDto.getName());
-        newUser.setEmail(registerUserDto.getEmail());
-        newUser.setPassword((new BCryptPasswordEncoder()).encode(registerUserDto.getPassword()));
-        newUser.setUserImage("default.png");
+        User newUser = User.builder()
+                .name(registerUserDto.getName())
+                .email(registerUserDto.getEmail())
+                .password((new BCryptPasswordEncoder()).encode(registerUserDto.getPassword()))
+                .userImage("default.png")
+                .age(20)
+                .city("")
+                .isBanned(false)
+                .build();
         Role role = Role.builder()
                 .id(1L)
                 .role("ROLE_USER")
                 .build();
         newUser.setRole(role);
-        newUser.setAge(20);
-        newUser.setCity("");
-        newUser.setIsBanned(false);
         userRepository.saveAndFlush(newUser);
         Map<String, String> tokens = tokenUtil.generatePair(newUser.getEmail(), role.getRole());
         tokenService.addToken(Token.builder()
@@ -87,16 +90,15 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     @Override
     public UserDto findByEmail(String email) {
         User user = userRepository.findByEmail(email);
-        return user == null ? null : userMapper.getUserDto(user);
+        if (user == null) {
+            throw new NoSuchElementException(USER_NOT_FOUND.getValue());
+        }
+        return userMapper.getUserDto(user);
     }
 
     @Override
     public UserDto findById(Long id) {
-        Optional<User> optionalUser = userRepository.findById(id);
-        if (optionalUser.isEmpty()) {
-            return null;
-        }
-        User user = optionalUser.get();
+        User user = userRepository.findById(id).orElseThrow(() -> new NoSuchElementException(USER_NOT_FOUND.getValue()));
         return userMapper.getUserDto(user);
     }
 
@@ -117,8 +119,8 @@ public class UserServiceImpl implements UserService, UserDetailsService {
 
     @Override
     public Boolean subscribe(Long idAuthor, Long idSubscriber) {
-        User author = userRepository.findById(idAuthor).orElseThrow();
-        User subscriber = userRepository.findById(idSubscriber).orElseThrow();
+        User author = userRepository.findById(idAuthor).orElseThrow(() -> new NoSuchElementException(USER_NOT_FOUND.getValue()));
+        User subscriber = userRepository.findById(idSubscriber).orElseThrow(() -> new NoSuchElementException(USER_NOT_FOUND.getValue()));
         if (author.getSubscribers().contains(subscriber)) {
             author.getSubscribers().remove(subscriber);
         } else {
@@ -130,14 +132,14 @@ public class UserServiceImpl implements UserService, UserDetailsService {
 
     @Override
     public Boolean amISubscribedToUser(Long idAuthor, Long idSubscriber) {
-        User author = userRepository.findById(idAuthor).orElseThrow();
-        User subscriber = userRepository.findById(idSubscriber).orElseThrow();
+        User author = userRepository.findById(idAuthor).orElseThrow(() -> new NoSuchElementException(USER_NOT_FOUND.getValue()));
+        User subscriber = userRepository.findById(idSubscriber).orElseThrow(() -> new NoSuchElementException(USER_NOT_FOUND.getValue()));
         return author.getSubscribers().contains(subscriber);
     }
 
     @Override
     public Boolean updateUser(UserDto userDto) {
-        User user = userRepository.findById(userDto.getId()).orElseThrow();
+        User user = userRepository.findById(userDto.getId()).orElseThrow(() -> new NoSuchElementException(USER_NOT_FOUND.getValue()));
         user.setName(userDto.getName());
         user.setAge(userDto.getAge());
         user.setCity(userDto.getCity());
@@ -162,7 +164,7 @@ public class UserServiceImpl implements UserService, UserDetailsService {
         try {
             return Files.readAllBytes(Path.of(environment.getProperty(envPath) + name));
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            throw new RuntimeException(ERROR_ON_FILE_READ.getValue());
         }
     }
 
@@ -172,7 +174,7 @@ public class UserServiceImpl implements UserService, UserDetailsService {
             File file = new File(environment.getProperty(envPath) + fileName);
             return Files.readAllBytes(file.toPath());
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            throw new RuntimeException(ERROR_ON_FILE_READ.getValue());
         }
     }
 
@@ -182,12 +184,15 @@ public class UserServiceImpl implements UserService, UserDetailsService {
                 && !file.getContentType().equals("image/jpg")
                 && !file.getContentType().equals("image/jpeg")
         ) {
-            throw new RuntimeException();
+            throw new RuntimeException(WRONG_FILE_TYPE.getValue());
         }
         try {
             String type = (file.getContentType().equals("image/png")) ? "png" : "jpg";
             String name = UUID.randomUUID() + "." + type;
             User user = userRepository.findByEmail(userEmail);
+            if (user == null) {
+                throw new NoSuchElementException(USER_NOT_FOUND.getValue());
+            }
             if (!user.getUserImage().equals("default.png")) {
                 deleteProfileImage(user.getEmail());
             }
@@ -196,7 +201,7 @@ public class UserServiceImpl implements UserService, UserDetailsService {
             file.transferTo(new File(environment.getProperty(envPath) + name));
             return name;
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            throw new RuntimeException(ERROR_ON_FILE_ADD.getValue());
         }
     }
 
@@ -204,12 +209,12 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     public Boolean deleteProfileImage(String userEmail) {
         User user = userRepository.findByEmail(userEmail);
         if (user == null) {
-            return false;
+            throw new NoSuchElementException(USER_NOT_FOUND.getValue());
         }
         try {
             Files.delete(Path.of(environment.getProperty(envPath) + user.getUserImage()));
         } catch (IOException e) {
-            return false;
+            throw new RuntimeException(ERROR_ON_FILE_DELETE.getValue());
         }
         user.setUserImage("default.png");
         userRepository.saveAndFlush(user);
@@ -219,14 +224,14 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     @Override
     public Boolean manageSubscriptionToEvent(String email, Long eventId) {
         User user = userRepository.findByEmail(email);
+        if (user == null) {
+            throw new NoSuchElementException(USER_NOT_FOUND.getValue());
+        }
         if (user.getSubscribedEvents().stream().anyMatch(event -> Objects.equals(event.getId(), eventId))) {
             return unsubscribeFromEvent(email, eventId);
         }
-        Optional<Event> event = eventRepository.findById(eventId);
-        if (event.isEmpty()) {
-            return false;
-        }
-        user.getSubscribedEvents().add(event.get());
+        Event event = eventRepository.findById(eventId).orElseThrow(() -> new NoSuchElementException(EVENT_NOT_FOUND.getValue()));
+        user.getSubscribedEvents().add(event);
         userRepository.saveAndFlush(user);
         return true;
     }
@@ -234,18 +239,18 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     @Override
     public Boolean unsubscribeFromEvent(String email, Long eventId) {
         User user = userRepository.findByEmail(email);
-        Optional<Event> event = eventRepository.findById(eventId);
-        if (event.isEmpty()) {
-            return false;
+        if (user == null) {
+            throw new NoSuchElementException(USER_NOT_FOUND.getValue());
         }
-        user.getSubscribedEvents().remove(event.get());
+        Event event = eventRepository.findById(eventId).orElseThrow(() -> new NoSuchElementException(EVENT_NOT_FOUND.getValue()));
+        user.getSubscribedEvents().remove(event);
         userRepository.saveAndFlush(user);
         return true;
     }
 
     @Override
     public List<EventDto> getSubscribedEvents(Long id, Integer page) {
-        User user = userRepository.findById(id).orElseThrow();
+        User user = userRepository.findById(id).orElseThrow(() -> new NoSuchElementException(USER_NOT_FOUND.getValue()));
         int startIndex = PAGE_SIZE * page;
         int endIndex = PAGE_SIZE * (page + 1);
         if (endIndex > user.getSubscribedEvents().size()) {
@@ -272,7 +277,7 @@ public class UserServiceImpl implements UserService, UserDetailsService {
 
     @Override
     public List<EventDto> getCreatedEvents(Long id, Integer page) {
-        User user = userRepository.findById(id).orElseThrow();
+        User user = userRepository.findById(id).orElseThrow(() -> new NoSuchElementException(USER_NOT_FOUND.getValue()));
         int startIndex = PAGE_SIZE * page;
         int endIndex = PAGE_SIZE * (page + 1);
         if (endIndex > user.getEventList().size()) {
@@ -301,7 +306,7 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
         User user = userRepository.findByEmail(email);
         if (user == null) {
-            throw new UsernameNotFoundException(String.format("Email '%s' was not found", email));
+            throw new NoSuchElementException(USER_NOT_FOUND.getValue());
         }
         return org.springframework.security.core.userdetails.User.builder()
                 .username(user.getName())
@@ -311,27 +316,27 @@ public class UserServiceImpl implements UserService, UserDetailsService {
 
     @Override
     public RoleDto getRole(String email) {
-        return roleMapper.getRoleDto(userRepository.findByEmail(email).getRole());
+        User user = userRepository.findByEmail(email);
+        if (user == null) {
+            throw new NoSuchElementException(USER_NOT_FOUND.getValue());
+        }
+        return roleMapper.getRoleDto(user.getRole());
     }
 
     @Override
     public FullUserDto getFullUserByEmail(String email) {
-        User found = userRepository.findByEmail(email);
-        if (found == null) {
-            return null;
+        User user = userRepository.findByEmail(email);
+        if (user == null) {
+            throw new NoSuchElementException(USER_NOT_FOUND.getValue());
         }
-        return userMapper.getFullUserDto(found);
+        return userMapper.getFullUserDto(user);
     }
 
     @Override
     public Boolean changeIsBanned(Long id) {
-        Optional<User> found = userRepository.findById(id);
-        if (found.isPresent()) {
-            User u = found.get();
-            u.setIsBanned(!u.getIsBanned());
-            userRepository.saveAndFlush(u);
-            return true;
-        }
-        return false;
+        User user = userRepository.findById(id).orElseThrow(() -> new NoSuchElementException(USER_NOT_FOUND.getValue()));
+        user.setIsBanned(!user.getIsBanned());
+        userRepository.saveAndFlush(user);
+        return true;
     }
 }

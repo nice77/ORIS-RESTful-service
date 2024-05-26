@@ -29,9 +29,12 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
+
+import static org.semester.util.StaticString.*;
 
 
 @Service
@@ -54,6 +57,9 @@ public class EventServiceImpl implements EventService {
     @Override
     public EventDto addEvent(OnCreateEventDto onCreateEventDto, String email) {
         User foundUser = userRepository.findByEmail(email);
+        if (foundUser == null) {
+            throw new NoSuchElementException("User with email not found");
+        }
         Event newEvent = eventRepository.saveAndFlush(eventMapper.getEventEntity(onCreateEventDto, foundUser));
         return eventMapper.getEventDto(newEvent);
     }
@@ -75,17 +81,13 @@ public class EventServiceImpl implements EventService {
 
     @Override
     public EventDto findById(Long id) {
-        Optional<Event> optionalEvent = eventRepository.findById(id);
-        if (optionalEvent.isEmpty()) {
-            return null;
-        }
-        Event event = optionalEvent.get();
+        Event event = eventRepository.findById(id).orElseThrow(() -> new NoSuchElementException("Event not found"));
         return eventMapper.getEventDto(event);
     }
 
     @Override
     public List<UserDto> getSubscribers(Long id, Integer page) {
-        return eventRepository.findById(id).orElseThrow().getSubscribedUsers()
+        return eventRepository.findById(id).orElseThrow(() -> new NoSuchElementException("Event not found")).getSubscribedUsers()
                 .stream()
                 .map(userMapper::getUserDto)
                 .collect(Collectors.toList());
@@ -94,7 +96,10 @@ public class EventServiceImpl implements EventService {
     @Override
     public Boolean updateEvent(OnUpdateEventDto onUpdateEventDto, String email) {
         User user = userRepository.findByEmail(email);
-        Event oldEvent = eventRepository.findById(onUpdateEventDto.getId()).orElseThrow();
+        if (user == null) {
+            throw new NoSuchElementException("User not found");
+        }
+        Event oldEvent = eventRepository.findById(onUpdateEventDto.getId()).orElseThrow(() -> new NoSuchElementException(EVENT_NOT_FOUND.getValue()));
         if (!user.getEventList().contains(oldEvent)) {
             throw new RuntimeException();
         }
@@ -110,11 +115,7 @@ public class EventServiceImpl implements EventService {
     @Override
     @Transactional
     public Boolean deleteEvent(Long id) {
-        Optional<Event> eventOptional = eventRepository.findById(id);
-        if (eventOptional.isEmpty()) {
-            return false;
-        }
-        Event event = eventOptional.get();
+        Event event = eventRepository.findById(id).orElseThrow(() -> new NoSuchElementException(EVENT_NOT_FOUND.getValue()));
         deleteImageFromDisk(event.getEventImages());
         eventRepository.delete(event);
         return true;
@@ -122,9 +123,11 @@ public class EventServiceImpl implements EventService {
 
     @Override
     public Boolean addImage(Long id, MultipartFile file, String email) {
-        System.out.println("Called method 2");
-        Event event = eventRepository.findById(id).orElseThrow();
+        Event event = eventRepository.findById(id).orElseThrow(() -> new NoSuchElementException(EVENT_NOT_FOUND.getValue()));
         User user = userRepository.findByEmail(email);
+        if (user == null) {
+            throw new NoSuchElementException(USER_NOT_FOUND.getValue());
+        }
         if (event.getAuthor().getId() != user.getId()) {
             return false;
         }
@@ -139,7 +142,7 @@ public class EventServiceImpl implements EventService {
         try {
             file.transferTo(new File(environment.getProperty(envPath) + "/events/" + name));
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            throw new RuntimeException(ERROR_ON_FILE_ADD.getValue());
         }
         eventRepository.saveAndFlush(event);
         return true;
@@ -148,16 +151,12 @@ public class EventServiceImpl implements EventService {
     @Override
     @Transactional
     public Boolean deleteImages(Long id) {
-        Optional<Event> eventOptional = eventRepository.findById(id);
-        if (eventOptional.isEmpty()) {
-            return false;
-        }
-        Event event = eventOptional.get();
+        Event event = eventRepository.findById(id).orElseThrow(() -> new NoSuchElementException(EVENT_NOT_FOUND.getValue()));
         List<EventImage> images = event.getEventImages();
         try {
             deleteImageFromDisk(images);
         } catch (RuntimeException e) {
-            return false;
+            throw new RuntimeException(ERROR_ON_FILE_ADD.getValue());
         }
         eventImageRepository.deleteByEventId(id);
         return true;
@@ -174,7 +173,7 @@ public class EventServiceImpl implements EventService {
         try {
             deleteImageFromDiskByNames(updatedNames);
         } catch (RuntimeException e) {
-            throw new RuntimeException(e);
+            throw new RuntimeException(ERROR_ON_FILE_ADD.getValue());
         }
     }
 
@@ -185,7 +184,7 @@ public class EventServiceImpl implements EventService {
         try {
             return Files.readAllBytes(Path.of(environment.getProperty(envPath) + "/events/" + name));
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            throw new RuntimeException(ERROR_ON_FILE_READ.getValue());
         }
     }
 
@@ -194,22 +193,22 @@ public class EventServiceImpl implements EventService {
         try {
             return Files.readAllBytes(Path.of(environment.getProperty(envPath) + "/events/" + name));
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            throw new RuntimeException(ERROR_ON_FILE_READ.getValue());
         }
     }
 
     @Override
     public List<CommentDto> getComments(Long id, Integer page) {
-        eventRepository.findById(id).orElseThrow();
+        eventRepository.findById(id).orElseThrow(() -> new NoSuchElementException(EVENT_NOT_FOUND.getValue()));
         return commentRepository.findCommentsByEventIdOrderByDateDesc(id, PageRequest.of(page, PAGE_SIZE)).stream().map(commentMapper::getCommentDto).toList();
     }
 
     @Override
     public CommentDto addComment(OnAddCommentDto onAddCommentDto, Long eventId, String email) {
         User user = userRepository.findByEmail(email);
-        Event event = eventRepository.findById(eventId).orElseThrow();
+        Event event = eventRepository.findById(eventId).orElseThrow(() -> new NoSuchElementException(EVENT_NOT_FOUND.getValue()));
         if (user == null) {
-            throw new RuntimeException();
+            throw new NoSuchElementException(USER_NOT_FOUND.getValue());
         }
         Comment newComment = commentMapper.getComment(onAddCommentDto, event, user);
         return commentMapper.getCommentDto(commentRepository.saveAndFlush(newComment));
@@ -221,7 +220,7 @@ public class EventServiceImpl implements EventService {
                 String fullPath = environment.getProperty(envPath) + "/events/" + eventImage.getPath();
                 Files.delete(Path.of(fullPath));
             } catch (IOException e) {
-                throw new RuntimeException(e);
+                throw new RuntimeException(ERROR_ON_FILE_DELETE.getValue());
             }
         });
     }
@@ -232,7 +231,7 @@ public class EventServiceImpl implements EventService {
                 String fullPath = environment.getProperty(envPath) + "/events/" + eventImage;
                 Files.delete(Path.of(fullPath));
             } catch (IOException e) {
-                throw new RuntimeException(e);
+                throw new RuntimeException(ERROR_ON_FILE_DELETE.getValue());
             }
         });
     }

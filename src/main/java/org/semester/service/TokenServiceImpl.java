@@ -5,6 +5,10 @@ import org.semester.entity.Token;
 import org.semester.repository.TokenRepository;
 import org.springframework.stereotype.Service;
 
+import java.util.NoSuchElementException;
+
+import static org.semester.util.StaticString.TOKEN_NOT_FOUND;
+
 
 @Service
 @AllArgsConstructor
@@ -14,18 +18,22 @@ public class TokenServiceImpl implements TokenService {
 
     @Override
     public Boolean checkIfTokenRevoked(Long tokenId) {
-        Token foundToken = tokenRepository.findById(tokenId).orElseThrow();
+        Token foundToken = tokenRepository.findById(tokenId).orElseThrow(() -> new NoSuchElementException(TOKEN_NOT_FOUND.getValue()));
         return foundToken.getIsRevoked();
     }
 
     @Override
     public Token addToken(Token token) {
-        return tokenRepository.save(token);
+        return tokenRepository.saveAndFlush(token);
     }
 
     @Override
     public Token getToken(String token) {
-        return tokenRepository.findByToken(token);
+        Token tokenEntity = tokenRepository.findByToken(token);
+        if (tokenEntity == null) {
+            throw new NoSuchElementException(TOKEN_NOT_FOUND.getValue());
+        }
+        return tokenEntity;
     }
 
     @Override

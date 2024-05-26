@@ -8,8 +8,6 @@ import org.semester.dto.eventDto.OnCreateEventDto;
 import org.semester.dto.eventDto.OnUpdateEventDto;
 import org.semester.dto.userDto.UserDto;
 import org.semester.service.EventService;
-import org.semester.service.UserService;
-import org.springframework.data.jpa.repository.Query;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -17,7 +15,6 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.security.Principal;
-import java.util.Arrays;
 import java.util.List;
 
 
