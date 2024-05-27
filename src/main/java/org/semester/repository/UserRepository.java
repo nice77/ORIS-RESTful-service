@@ -47,7 +47,7 @@ public interface UserRepository extends JpaRepository<User, Long> {
     @Query(
             nativeQuery = true,
             value = """
-                    select fetch_users(:userId, :page)
+                    select * from fetch_users(:userId, :page) as users
                     """
     )
     List<User> getUserRecommendations(Long userId, Integer page);

@@ -16,7 +16,7 @@ public interface EventRepository extends JpaRepository<Event, Long> {
     @Query(
             nativeQuery = true,
             value = """
-                    select fetch_events(:eventId, :page)
+                    select * from fetch_events(:eventId, :page) as events
                     """
     )
     List<Event> fetchEventRecommendations(Long eventId, Integer page);
