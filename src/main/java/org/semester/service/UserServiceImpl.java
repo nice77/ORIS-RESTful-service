@@ -333,6 +333,11 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     }
 
     @Override
+    public List<UserDto> getRecommendedUsers(Long id, Integer page) {
+        return userRepository.getUserRecommendations(id, page).stream().map(userMapper::getUserDto).collect(Collectors.toList());
+    }
+
+    @Override
     public Boolean changeIsBanned(Long id) {
         User user = userRepository.findById(id).orElseThrow(() -> new NoSuchElementException(USER_NOT_FOUND.getValue()));
         user.setIsBanned(!user.getIsBanned());

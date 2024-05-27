@@ -214,6 +214,11 @@ public class EventServiceImpl implements EventService {
         return commentMapper.getCommentDto(commentRepository.saveAndFlush(newComment));
     }
 
+    @Override
+    public List<EventDto> getRecommendedEvents(Long id, Integer page) {
+        return eventRepository.fetchEventRecommendations(id, page).stream().map(eventMapper::getEventDto).toList();
+    }
+
     private void deleteImageFromDisk(List<EventImage> images) {
         images.forEach(eventImage -> {
             try {

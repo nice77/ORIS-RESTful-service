@@ -25,4 +25,5 @@ public interface EventService {
     byte[] getImage(String name);
     List<CommentDto> getComments(Long id, Integer page);
     CommentDto addComment(OnAddCommentDto onAddCommentDto, Long eventId, String email);
+    List<EventDto> getRecommendedEvents(Long id, Integer page);
 }

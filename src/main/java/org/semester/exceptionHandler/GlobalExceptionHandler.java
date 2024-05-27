@@ -9,6 +9,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
+import java.util.NoSuchElementException;
+
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
@@ -22,7 +24,7 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(ex.getMessage());
     }
 
-    @ExceptionHandler(RuntimeException.class)
+    @ExceptionHandler(NoSuchElementException.class)
     public ResponseEntity<String> exceptionHandler(Exception ex){
         return switch (StaticString.getByValue(ex.getMessage())) {
             case ERROR_ON_FILE_ADD, ERROR_ON_FILE_READ, ERROR_ON_FILE_DELETE, EVENT_NOT_FOUND, USER_NOT_FOUND, TOKEN_NOT_FOUND ->

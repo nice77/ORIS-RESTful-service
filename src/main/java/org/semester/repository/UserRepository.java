@@ -43,4 +43,12 @@ public interface UserRepository extends JpaRepository<User, Long> {
                     "where us.event_id = :eventId and u.id = :userId"
     )
     Boolean amISubscribedToEvent(Long userId, Long eventId);
+
+    @Query(
+            nativeQuery = true,
+            value = """
+                    select fetch_users(:userId, :page)
+                    """
+    )
+    List<User> getUserRecommendations(Long userId, Integer page);
 }

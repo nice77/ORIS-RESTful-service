@@ -29,11 +29,7 @@ public class TokenServiceImpl implements TokenService {
 
     @Override
     public Token getToken(String token) {
-        Token tokenEntity = tokenRepository.findByToken(token);
-        if (tokenEntity == null) {
-            throw new NoSuchElementException(TOKEN_NOT_FOUND.getValue());
-        }
-        return tokenEntity;
+        return tokenRepository.findByToken(token).orElseThrow(() -> new NoSuchElementException(TOKEN_NOT_FOUND.getValue()));
     }
 
     @Override

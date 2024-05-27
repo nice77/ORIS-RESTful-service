@@ -7,7 +7,10 @@ import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
 
+import java.util.NoSuchElementException;
+import java.util.Optional;
+
 
 public interface TokenRepository extends JpaRepository<Token, Long> {
-    Token findByToken(String token);
+    Optional<Token> findByToken(String token);
 }

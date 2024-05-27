@@ -8,6 +8,7 @@ import org.semester.dto.eventDto.OnCreateEventDto;
 import org.semester.dto.eventDto.OnUpdateEventDto;
 import org.semester.dto.userDto.UserDto;
 import org.semester.service.EventService;
+import org.semester.service.UserService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -24,10 +25,16 @@ import java.util.List;
 public class EventController {
 
     private EventService eventService;
+    private UserService userService;
 
     @GetMapping("/{id}")
     public EventDto getEvent(@PathVariable Long id) {
         return eventService.findById(id);
+    }
+
+    @GetMapping("/feed")
+    public List<EventDto> getRecommendedEvents(Principal principal, @RequestParam("page") Integer page) {
+        return eventService.getRecommendedEvents(userService.getFullUserByEmail(principal.getName()).getId(), page);
     }
 
     @GetMapping(params = {"name", "page"})

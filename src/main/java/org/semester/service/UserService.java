@@ -35,4 +35,5 @@ public interface UserService {
     RoleDto getRole(String email);
     Boolean changeIsBanned(Long id);
     FullUserDto getFullUserByEmail(String email);
+    List<UserDto> getRecommendedUsers(Long id, Integer page);
 }

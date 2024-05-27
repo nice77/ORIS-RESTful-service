@@ -47,6 +47,11 @@ public class UserController {
         return userService.getFullUserByEmail(principal.getName()).getId();
     }
 
+    @GetMapping("/feed")
+    public List<UserDto> getRecommendedUsers(@RequestParam(defaultValue = "0") Integer page, Principal principal) {
+        return userService.getRecommendedUsers(userService.getFullUserByEmail(principal.getName()).getId(), page);
+    }
+
 
 
     @GetMapping(

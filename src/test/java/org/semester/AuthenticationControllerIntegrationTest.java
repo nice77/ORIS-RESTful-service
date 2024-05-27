@@ -61,7 +61,7 @@ public class AuthenticationControllerIntegrationTest {
     @Test
     public void testInvalidRefresh() throws Exception {
         mockMvc.perform(
-                        MockMvcRequestBuilders.post("/auth/authorization")
+                        MockMvcRequestBuilders.post("/auth/refresh_token")
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .content(
                                         """
@@ -70,7 +70,7 @@ public class AuthenticationControllerIntegrationTest {
                                         }
                                         """
                                 )
-                ).andExpect(MockMvcResultMatchers.status().isUnauthorized())
+                ).andExpect(MockMvcResultMatchers.status().isNotFound())
                 .andReturn();
     }
 }
