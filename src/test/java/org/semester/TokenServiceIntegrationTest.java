@@ -26,7 +26,7 @@ public class TokenServiceIntegrationTest {
 
     @Test
     void testGetToken() throws Exception {
-        assertNull(tokenService.getToken("random_token_that_not_exists"));
+        assertNotNull(null, tokenService.getToken("eyJhbGciOiJIUzI1NiJ9.eyJyb2xlIjoiUk9MRV9BRE1JTikiLCJ0eXBlIjoicmVmcmVzaCIsImVtYWlsIjoiMUBnbWFpbC5jb20iLCJpYXQiOjE3MTY3MzA2NzIsImV4cCI6MTcxNjgxNzA3Mn0.L5tjpk0dlAci0DiSXIXoGRulLwRwAPepaCNZE7PEfgM"));
     }
 
     @Test
