@@ -64,11 +64,8 @@ public class TokenFilter extends OncePerRequestFilter {
 
     private void sendError(HttpServletResponse response, int sc, String message) {
         try {
-            ObjectMapper mapper = new ObjectMapper();
-            ErrorDto error = new ErrorDto(message);
             response.setStatus(sc);
-            response.setContentType(MediaType.APPLICATION_JSON_VALUE);
-            response.getWriter().write(mapper.writeValueAsString(error));
+            response.getWriter().write(message);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
