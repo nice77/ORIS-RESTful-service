@@ -1,0 +1,180 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!--  Text  -->
+    <style name="Text" parent="Widget.MaterialComponents.TextView">
+        <item name="android:textColor">?attr/colorOnBackground</item>
+        <item name="android:textAlignment">center</item>
+    </style>
+
+    <!--  Text Bold  -->
+    <style name="Text.Bold">
+        <item name="fontFamily">@font/satoshi_bold</item>
+    </style>
+
+    <style name="Text.Bold.Large">
+        <item name="android:textSize">30sp</item>
+    </style>
+
+    <style name="Text.Bold.Medium">
+        <item name="android:textSize">25sp</item>
+    </style>
+
+    <style name="Text.Bold.Small">
+        <item name="android:textSize">20sp</item>
+    </style>
+
+    <style name="Text.Bold.ExtraSmall">
+        <item name="android:textSize">15sp</item>
+    </style>
+
+    <style name="Text.Bold.Large.ColorPrimary">
+        <item name="android:textColor">?attr/colorPrimary</item>
+    </style>
+
+    <style name="Text.Bold.Medium.ColorPrimary">
+        <item name="android:textColor">?attr/colorPrimary</item>
+    </style>
+
+    <style name="Text.Bold.Small.ColorPrimary">
+        <item name="android:textColor">?attr/colorPrimary</item>
+    </style>
+
+    <style name="Text.Bold.ExtraSmall.ColorPrimary">
+        <item name="android:textColor">?attr/colorPrimary</item>
+    </style>
+
+    <!--  Text Medium  -->
+    <style name="Text.Medium" parent="Text">
+        <item name="fontFamily">@font/satoshi_medium</item>
+    </style>
+
+    <style name="Text.Medium.Large">
+        <item name="android:textSize">30sp</item>
+    </style>
+
+    <style name="Text.Medium.Medium">
+        <item name="android:textSize">25sp</item>
+    </style>
+
+    <style name="Text.Medium.Small">
+        <item name="android:textSize">20sp</item>
+    </style>
+
+    <style name="Text.Medium.ExtraSmall">
+        <item name="android:textSize">15sp</item>
+    </style>
+
+    <style name="Text.Medium.Large.ColorPrimary">
+        <item name="android:textColor">?attr/colorPrimary</item>
+    </style>
+
+    <style name="Text.Medium.Medium.ColorPrimary">
+        <item name="android:textColor">?attr/colorPrimary</item>
+    </style>
+
+    <style name="Text.Medium.Small.ColorPrimary">
+        <item name="android:textColor">?attr/colorPrimary</item>
+    </style>
+
+    <style name="Text.Medium.ExtraSmall.ColorPrimary">
+        <item name="android:textColor">?attr/colorPrimary</item>
+    </style>
+
+    <!--  Text Regular  -->
+    <style name="Text.Regular" parent="Text">
+        <item name="fontFamily">@font/satoshi_regular</item>
+    </style>
+
+    <style name="Text.Regular.Large">
+        <item name="android:textSize">30sp</item>
+    </style>
+
+    <style name="Text.Regular.Medium">
+        <item name="android:textSize">25sp</item>
+    </style>
+
+    <style name="Text.Regular.Small">
+        <item name="android:textSize">20sp</item>
+    </style>
+
+    <style name="Text.Regular.ExtraSmall">
+        <item name="android:textSize">15sp</item>
+    </style>
+
+    <style name="Text.Regular.Large.ColorPrimary">
+        <item name="android:textColor">?attr/colorPrimary</item>
+    </style>
+
+    <style name="Text.Regular.Medium.ColorPrimary">
+        <item name="android:textColor">?attr/colorPrimary</item>
+    </style>
+
+    <style name="Text.Regular.Small.ColorPrimary">
+        <item name="android:textColor">?attr/colorPrimary</item>
+    </style>
+
+    <style name="Text.Regular.ExtraSmall.ColorPrimary">
+        <item name="android:textColor">?attr/colorPrimary</item>
+    </style>
+
+    <!--  Buttons  -->
+    <style name="Button" parent="Widget.MaterialComponents.Button">
+        <item name="android:textAppearance">@style/Text.Medium.Small</item>
+        <item name="android:paddingHorizontal">40sp</item>
+        <item name="android:paddingVertical">23sp</item>
+        <item name="android:background">@drawable/border_btn</item>
+        <item name="android:textAllCaps">false</item>
+    </style>
+
+    <style name="Button.PaddingSmall">
+        <item name="android:paddingVertical">10dp</item>
+    </style>
+
+    <style name="Button.Transparent">
+        <item name="android:background">@android:color/transparent</item>
+        <item name="android:textColor">?attr/colorOnBackground</item>
+    </style>
+    
+    <!--  EditText  -->
+    <style name="EditText" parent="ThemeOverlay.Material3.TextInputEditText">
+        <item name="android:background">@drawable/border_et</item>
+        <item name="android:padding">30dp</item>
+        <item name="android:textAppearance">@style/Text.Medium.Small</item>
+    </style>
+
+    <style name="EditText.PaddingSmall">
+        <item name="android:padding">17dp</item>
+    </style>
+
+
+    <!--  User CardView  -->
+    <style name="UserCardView" parent="@style/Widget.MaterialComponents.CardView">
+        <item name="shapeAppearanceOverlay">@style/ShapeAppearanceOverlay_card_custom_corners</item>
+    </style>
+
+    <style name="ShapeAppearanceOverlay_card_custom_corners">
+        <item name="cornerFamily">rounded</item>
+        <item name="cornerSizeBottomRight">48dp</item>
+        <item name="cornerSizeBottomLeft">48dp</item>
+    </style>
+    
+    <!--  RadioButton  -->
+    <style name="CustomRadioButton" parent="Widget.Material3.CompoundButton.RadioButton">
+        <item name="buttonTint">?attr/colorPrimary</item>
+        <item name="android:textAppearance">@style/Text.Medium.ExtraSmall</item>
+    </style>
+
+    <style name="ProfileFilterRadioButton" parent="CustomRadioButton">
+        <item name="android:button">@android:color/transparent</item>
+        <item name="android:textColor">@drawable/filter_radio_button_text_selector_bg</item>
+        <item name="android:textAppearance">@style/Text.Medium.Small</item>
+    </style>
+
+    <style name="CustomRadioButton.ThemePageRadioButton">
+        <item name="android:textColor">@drawable/theme_radiobutton_text_selector_bg</item>
+        <item name="android:textAppearance">@style/Text.Medium.Small</item>
+        <item name="android:button">"@null"</item>
+        <item name="android:layout_margin">8dp</item>
+    </style>
+
+</resources>

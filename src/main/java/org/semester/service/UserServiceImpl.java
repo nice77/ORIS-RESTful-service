@@ -91,7 +91,7 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     public UserDto findByEmail(String email) {
         User user = userRepository.findByEmail(email);
         if (user == null) {
-            throw new NoSuchElementException(USER_NOT_FOUND.getValue());
+            return null;
         }
         return userMapper.getUserDto(user);
     }

@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:context=".presentation.themechoose.ThemeChooseFragment"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <ImageView
+        android:id="@+id/bg_image"
+        android:src="@drawable/img_2"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:scaleType="centerCrop"
+        android:foreground="@drawable/inverse_color_bottom_gradient"/>
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/theme_upper_gl"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:orientation="horizontal"
+        app:layout_constraintGuide_percent="0.5"/>
+
+    <TextView
+        android:id="@+id/choose_mode_tv"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toBottomOf="@id/theme_upper_gl"
+        app:layout_constraintBottom_toTopOf="@id/theme_rg"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:text="@string/choose_mode"
+        android:textColor="?attr/colorOnPrimary"
+        style="@style/Text.Medium.Medium"/>
+
+    <RadioGroup
+        android:id="@+id/theme_rg"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toBottomOf="@id/choose_mode_tv"
+        app:layout_constraintBottom_toTopOf="@id/submit_btn"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:orientation="horizontal">
+
+        <RadioButton
+            android:id="@+id/theme_dark_rb"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/dark_theme"
+            style="@style/CustomRadioButton.ThemePageRadioButton"
+            android:drawableTop="@drawable/icon_moon"
+            android:checked="true"/>
+
+        <RadioButton
+            android:id="@+id/theme_light_rb"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/light_theme"
+            style="@style/CustomRadioButton.ThemePageRadioButton"
+            android:drawableTop="@drawable/icon_sun"/>
+    </RadioGroup>
+
+    <Button
+        android:id="@+id/submit_btn"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/submit"
+        style="@style/Button"
+        android:layout_marginHorizontal="16dp"
+        app:layout_constraintBottom_toBottomOf="@id/theme_bottom_gl"
+        app:layout_constraintTop_toBottomOf="@id/theme_rg"/>
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/theme_bottom_gl"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:orientation="horizontal"
+        app:layout_constraintGuide_percent="0.9"/>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

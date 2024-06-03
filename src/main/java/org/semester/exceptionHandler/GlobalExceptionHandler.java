@@ -26,7 +26,7 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(ex.getMessage());
     }
 
-    @ExceptionHandler(NoSuchElementException.class)
+    @ExceptionHandler(RuntimeException.class)
     public ResponseEntity<Object> exceptionHandler(Exception ex){
         return switch (StaticString.getByValue(ex.getMessage())) {
             case ERROR_ON_FILE_ADD, ERROR_ON_FILE_READ, ERROR_ON_FILE_DELETE, EVENT_NOT_FOUND, USER_NOT_FOUND, TOKEN_NOT_FOUND ->
